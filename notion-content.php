@@ -11,11 +11,14 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 // Define plugin path
 define('NOTION_CONTENT_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
+
+
 // Include required files
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-menu.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/settings.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/shortcode.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/notion-api.php';
+
 
 
 
@@ -43,4 +46,14 @@ function notion_content_create_table() {
 }
 
 
+function notion_content_admin_msg($message) {
+?>
+    <div class="notice notice-success is-dismissible"> <p><?php echo $message; ?></p> </div>
+<?php
+}
 
+
+function notion_content_enqueue_styles() {
+    wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
+}
+add_action('admin_enqueue_scripts', 'notion_content_enqueue_styles');

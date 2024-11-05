@@ -1,0 +1,12 @@
+/* css/custom-styles.css */
+.widefat {
+    width: 100%; /* Makes the text fields use full width */
+    max-width: 900px; /* Set a maximum width if desired */
+    min-height: 40px; /* Adjust height if necessary */
+    padding: 10px; /* Add some padding */
+}
+
+
+.widetable {
+    max-width: 100%;
+}

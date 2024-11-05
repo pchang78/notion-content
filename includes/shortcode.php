@@ -18,4 +18,3 @@ function notion_page_shortcode($atts) {
         return '<p>Content not found or inactive.</p>';
     }
 }
-?>

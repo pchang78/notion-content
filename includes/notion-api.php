@@ -292,4 +292,4 @@ function notion_get_page_title($api_key, $page_id) {
 
     return 'Untitled Page'; // Default if no title is found
 }
-?>
+

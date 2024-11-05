@@ -5,6 +5,8 @@ Wordpress Plugin for displaying content from Notion using the Notion API.  This 
 
 This plugin take a simple Notion Database and allows you to display the contents of that database in a Wordpress site.  Sample Notion Page Coming Soon
 ___
+## How it Works
+Using the Notion API, the list of pages and the contents of those pages are stored locally in your local Wordpress database instance.  The table is called notion_content.  The local database acts as a cache and does not require a Notion API call everytime a user visits the page the content is being used on.  ___
 
 ## Requirements
 
@@ -45,4 +47,5 @@ You will need to setup a Notion
 ## Coming Soon
 - Toggle
 - Notion Simple Tables
+- Dividers
 

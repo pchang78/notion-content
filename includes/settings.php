@@ -9,6 +9,15 @@ function notion_content_register_settings() {
 }
 
 function notion_content_display_settings() {
+
+    if (isset($_GET['settings-updated'])) {
+        add_settings_error('notion_content_messages', 'notion_content_message', 'Settings have been saved.', 'updated');
+    }
+
+    settings_errors('notion_content_messages');
+
+
+
     ?>
     <div class="wrap">
         <h1>Notion Content Settings</h1>
@@ -19,12 +28,12 @@ function notion_content_display_settings() {
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Notion API Key</th>
-                    <td><input type="text" name="notion_api_key" value="<?php echo esc_attr(get_option('notion_api_key')); ?>" /></td>
+                    <td><input type="text" name="notion_api_key" value="<?php echo esc_attr(get_option('notion_api_key')); ?>" class="widefat" /></td>
                 </tr>
                 
                 <tr valign="top">
                     <th scope="row">Notion Database URL</th>
-                    <td><input type="text" name="notion_database_url" value="<?php echo esc_attr(get_option('notion_database_url')); ?>" /></td>
+                    <td><input type="text" name="notion_database_url" value="<?php echo esc_attr(get_option('notion_database_url')); ?>" class="widefat" /></td>
                 </tr>
             </table>
             
@@ -33,4 +42,3 @@ function notion_content_display_settings() {
     </div>
     <?php
 }
-?>

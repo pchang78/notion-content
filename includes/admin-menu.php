@@ -8,8 +8,7 @@ function notion_content_admin_menu() {
         'manage_options',
         'notion-content',
         'notion_content_display_pages',
-        'dashicons-layout',
-        20
+        'dashicons-layout', 20
     );
 
     add_submenu_page(
@@ -24,39 +23,51 @@ function notion_content_admin_menu() {
 
 
 function notion_content_display_pages() {
+    // Refresh all content action
+    if (isset($_POST['refresh_content'])) {
+        notion_content_refresh(); // Refresh all pages
+        notion_content_admin_msg("All Content Updated");
+    }
+
+    // Refresh individual page action
+    if (isset($_POST['refresh_single_page']) && isset($_POST['page_id'])) {
+        $page_id = sanitize_text_field($_POST['page_id']); // Ensure page_id is a string
+        notion_content_refresh_single_page($page_id); // Refresh specific page
+        notion_content_admin_msg("Content " . $page_id . " updated");
+    }
+
     ?>
     <div class="wrap">
         <h1>Notion Pages</h1>
+        
         <form method="post">
             <input type="submit" name="refresh_content" class="button button-primary" value="Refresh All Content">
         </form>
         <br>
+        
         <?php
-        if (isset($_POST['refresh_content'])) {
-            notion_content_refresh(); // Refresh all pages
-        }
-
-        if (isset($_POST['refresh_single_page'])) {
-            notion_content_refresh_single_page(sanitize_text_field($_POST['page_id'])); // Refresh individual page
-        }
-
         global $wpdb;
         $table_name = $wpdb->prefix . 'notion_content';
         
         $pages = $wpdb->get_results("SELECT * FROM $table_name WHERE is_active = 1", ARRAY_A);
 
         if ($pages) {
-            echo '<table class="wp-list-table widefat fixed striped">';
-            echo '<thead><tr><th>Title</th><th>Shortcode</th><th>Actions</th></tr></thead>';
+            echo '<table class="wp-list-table widefat widetable fixed striped">';
+            echo '<thead><tr><th>Title</th><th>Shortcode</th><th>Last Updated</th><th>Actions</th></tr></thead>';
             echo '<tbody>';
             foreach ($pages as $page) {
                 $title = esc_html($page['title']);
                 $page_id = esc_attr($page['page_id']);
+                $last_updated = esc_html($page['last_updated']);
                 $shortcode = '[notion_page page_id="' . $page_id . '"]';
                 
                 echo '<tr>';
                 echo '<td>' . $title . '</td>';
-                echo '<td><code>' . esc_html($shortcode) . '</code></td>';
+                echo '<td>';
+                echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 300px;"/> ';
+                echo '<button class="button copy-button" data-shortcode="' . esc_attr($shortcode) . '">Copy</button>';
+                echo '</td>';
+                echo '<td>' . $last_updated . '</td>';
                 echo '<td>';
                 echo '<form method="post" style="display:inline;">';
                 echo '<input type="hidden" name="page_id" value="' . $page_id . '">';
@@ -72,6 +83,27 @@ function notion_content_display_pages() {
         }
         ?>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButtons = document.querySelectorAll('.copy-button');
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const shortcode = this.getAttribute('data-shortcode');
+                    const tempInput = document.createElement('input');
+                    document.body.appendChild(tempInput);
+                    tempInput.value = shortcode;
+                    tempInput.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempInput);
+                    alert('Shortcode copied to clipboard!'); // Optional alert
+                });
+            });
+        });
+    </script>
+
+
+
     <?php
 }
-?>
+
