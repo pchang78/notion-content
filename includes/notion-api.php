@@ -126,31 +126,38 @@ function notion_render_block($block) {
 }
 
 
-// Helper function to extract and concatenate text with rich formatting
 function notion_get_text($rich_text_array) {
-    $formatted_text = '';
-    foreach ($rich_text_array as $text_block) {
-        $text = esc_html($text_block['plain_text']); // Escape HTML characters
+    $text = '';
 
-        // Apply formatting based on text_block annotations
-        $annotations = $text_block['annotations'];
-
-        if ($annotations['bold']) {
-            $text = "<strong>$text</strong>";
-        }
-        if ($annotations['italic']) {
-            $text = "<em>$text</em>";
-        }
-        if ($annotations['underline']) {
-            $text = "<u>$text</u>";
+    foreach ($rich_text_array as $rich_text) {
+        $plain_text = esc_html($rich_text['plain_text']);
+        
+        // Check if there's a link in the text
+        if (isset($rich_text['href']) && !empty($rich_text['href'])) {
+            $url = esc_url($rich_text['href']);
+            $plain_text = "<a href=\"$url\" target=\"_blank\">$plain_text</a>";
         }
 
-        // Append formatted text to result
-        $formatted_text .= $text;
+        // Apply text styling (bold, italic, underline)
+        if (isset($rich_text['annotations'])) {
+            $annotations = $rich_text['annotations'];
+            if ($annotations['bold']) {
+                $plain_text = "<strong>$plain_text</strong>";
+            }
+            if ($annotations['italic']) {
+                $plain_text = "<em>$plain_text</em>";
+            }
+            if ($annotations['underline']) {
+                $plain_text = "<u>$plain_text</u>";
+            }
+        }
+
+        // Append to the final text
+        $text .= $plain_text;
     }
-    return $formatted_text;
-}
 
+    return $text;
+}
 
 
 
