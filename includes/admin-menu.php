@@ -19,6 +19,7 @@ function notion_content_admin_menu() {
         'notion-content-settings',
         'notion_content_display_settings'
     );
+
 }
 
 
