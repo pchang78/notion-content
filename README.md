@@ -49,7 +49,9 @@ You will need to setup a Notion
 - Callout
 - Toggle
 - Dividers
+- Notion Simple Tables
 
 
 ## Coming Soon
-- Notion Simple Tables
+- Ability to add classes to different supported blocks
+- Custom Styles

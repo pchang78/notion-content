@@ -122,6 +122,23 @@ function notion_render_block($block, $api_key) {
         case 'divider':
             $html = "<hr>";
             break;
+
+
+        case 'table':
+            $html = "<table>\n";
+            $table_content = notion_get_page_content($api_key, $blockID);
+            $html .= $table_content;
+            $html .= "<table>";
+            break;
+
+        case 'table_row':
+            $html = "<tr>";
+            $html .= notion_get_table_cells($block['table_row']['cells']);
+            $html .= "</tr>";
+            
+            break;
+
+
         default:
             $html = "<p>[Unsupported block type: {$block['type']}]</p>";
             break;
@@ -129,10 +146,22 @@ function notion_render_block($block, $api_key) {
     return $html . "\n";
 }
 
-
-function notion_get_text($rich_text_array) {
+// Get table cells for a given row
+function notion_get_table_cells($table_cells) {
     $text = '';
+    foreach($table_cells AS $cell) {
+        $text .= '
+            <td>';
+        $text .= notion_get_text($cell, true);
+        $text .= '</td>';
+    }
+    return $text;
+}
 
+
+
+function notion_get_text($rich_text_array, $add_breaks = false) {
+    $text = '';
     foreach ($rich_text_array as $rich_text) {
         $plain_text = esc_html($rich_text['plain_text']);
         
@@ -141,7 +170,6 @@ function notion_get_text($rich_text_array) {
             $url = esc_url($rich_text['href']);
             $plain_text = "<a href=\"$url\" target=\"_blank\">$plain_text</a>";
         }
-
         // Apply text styling (bold, italic, underline)
         if (isset($rich_text['annotations'])) {
             $annotations = $rich_text['annotations'];
@@ -155,9 +183,11 @@ function notion_get_text($rich_text_array) {
                 $plain_text = "<u>$plain_text</u>";
             }
         }
-
         // Append to the final text
         $text .= $plain_text;
+    }
+    if($add_breaks) {
+        $text = str_replace("\n", "<br>", $text);
     }
 
     return $text;
