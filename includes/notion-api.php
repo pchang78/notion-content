@@ -57,7 +57,7 @@ function notion_get_page_content($api_key, $page_id) {
     if (isset($body['results'])) {
         $content = '';
         foreach ($body['results'] as $block) {
-            $content .= notion_render_block($block);
+            $content .= notion_render_block($block, $api_key);
         }
         return $content;
     }
@@ -66,8 +66,9 @@ function notion_get_page_content($api_key, $page_id) {
 }
 
 // Render individual block types as HTML
-function notion_render_block($block) {
+function notion_render_block($block, $api_key) {
     $html = '';
+    $blockID = trim(str_replace("-", "", $block['id']));
     
     switch ($block['type']) {
         case 'paragraph':
@@ -106,12 +107,12 @@ function notion_render_block($block) {
             $html = "<p><input type='checkbox' $checked disabled> $text</p>";
             break;
 
-            /*
         case 'toggle':
+            $toggle_content = "";
+            $toggle_content = notion_get_page_content($api_key, $blockID);
             $text = notion_get_text($block['toggle']['rich_text']);
-            $html = "<details><summary>$text</summary></details>";
+            $html = "<details><summary>$text</summary>$toggle_content</details>";
             break;
-            */
 
         case 'quote':
             $text = notion_get_text($block['quote']['rich_text']);
