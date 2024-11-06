@@ -53,11 +53,42 @@ function notion_get_page_content($api_key, $page_id) {
     }
 
     $body = json_decode(wp_remote_retrieve_body($response), true);
+    $bulleted_list_item = false;
+    $numbered_list_item = false;
     
     if (isset($body['results'])) {
         $content = '';
         foreach ($body['results'] as $block) {
-            $content .= notion_render_block($block, $api_key);
+
+            $extra = "";
+            switch($block['type']) {
+                case "bulleted_list_item":
+                    if(!$bulleted_list_item) {
+                        $bulleted_list_item = true;
+                        $extra = "open";
+                    }
+                    break;
+
+                case "numbered_list_item":
+                    if(!$numbered_list_item) {
+                        $numbered_list_item = true;
+                        $extra = "open";
+                    }
+                    break;
+
+                default: 
+                    if($bulleted_list_item) {
+                        $bulleted_list_item = false;
+                        $content .= "</ul>";
+                    }
+                    if($numbered_list_item) {
+                        $numbered_list_item = false;
+                        $content .= "</ol>";
+                    }
+                    break;
+            }
+
+            $content .= notion_render_block($block, $api_key, $extra);
         }
         return $content;
     }
@@ -66,7 +97,7 @@ function notion_get_page_content($api_key, $page_id) {
 }
 
 // Render individual block types as HTML
-function notion_render_block($block, $api_key) {
+function notion_render_block($block, $api_key, $extra = "") {
     $html = '';
     $blockID = trim(str_replace("-", "", $block['id']));
     
@@ -94,11 +125,17 @@ function notion_render_block($block, $api_key) {
         case 'bulleted_list_item':
             $text = notion_get_text($block['bulleted_list_item']['rich_text']);
             $html = "<li>$text</li>";
+            if($extra == "open") {
+                $html = "<ul>$html";
+            }
             break;
 
         case 'numbered_list_item':
             $text = notion_get_text($block['numbered_list_item']['rich_text']);
             $html = "<li>$text</li>";
+            if($extra == "open") {
+                $html = "<ol>$html";
+            }
             break;
 
         case 'to_do':
