@@ -128,7 +128,7 @@ function notion_render_block($block, $api_key) {
             $html = "<table>\n";
             $table_content = notion_get_page_content($api_key, $blockID);
             $html .= $table_content;
-            $html .= "<table>";
+            $html .= "</table>";
             break;
 
         case 'table_row':
