@@ -47,10 +47,9 @@ You will need to setup a Notion
 - To Do
 - Quote
 - Callout
+- Toggle
+- Dividers
 
 
 ## Coming Soon
-- Toggle
 - Notion Simple Tables
-- Dividers
-

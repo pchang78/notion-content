@@ -119,6 +119,9 @@ function notion_render_block($block, $api_key) {
             $html = "<blockquote>$text</blockquote>";
             break;
 
+        case 'divider':
+            $html = "<hr>";
+            break;
         default:
             $html = "<p>[Unsupported block type: {$block['type']}]</p>";
             break;
