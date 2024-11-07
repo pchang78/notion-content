@@ -53,6 +53,11 @@ You will need to setup a Notion
 
 ---
 
-## Custom Styles
+## Blocks / Features Coming Soon
+- Images (Uploaded images directly to Wordpress Media Library)
+- Column Layout in Notion
 
+---
+
+## Custom Styles
 You are not able to add custom classes and custom CSS.  Currenty you can only add classes to table and unorder list tags
