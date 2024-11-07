@@ -56,8 +56,9 @@ You will need to setup a Notion
 ## Blocks / Features Coming Soon
 - Images (Uploaded images directly to Wordpress Media Library)
 - Column Layout in Notion
+- Add more instructions on how to setup API and page integration
 
 ---
 
 ## Custom Styles
-You are not able to add custom classes and custom CSS.  Currenty you can only add classes to table and unorder list tags
+You are now able to add custom classes and custom CSS.  Currenty you can only add classes to table and unorder list tags
