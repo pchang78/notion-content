@@ -2,13 +2,24 @@
 
 add_action('admin_menu', 'notion_content_admin_menu');
 function notion_content_admin_menu() {
+
     add_menu_page(
         'Notion Content',
         'Notion Content',
         'manage_options',
         'notion-content',
         'notion_content_display_pages',
-        'dashicons-layout', 20
+        plugins_url('../assets/notion-content-icon.png', __FILE__),
+        20
+    );
+
+    add_submenu_page(
+        'notion-content', // Parent slug
+        'Styles',                  // Page title
+        'Styles',                  // Menu title
+        'manage_options',          // Capability
+        'notion-content-styles',   // Menu slug
+        'notion_content_styles_page' // Function to display the styles page
     );
 
     add_submenu_page(
@@ -53,7 +64,7 @@ function notion_content_display_pages() {
         $pages = $wpdb->get_results("SELECT * FROM $table_name WHERE is_active = 1", ARRAY_A);
 
         if ($pages) {
-            echo '<table class="wp-list-table widefat widetable fixed striped">';
+            echo '<table class="wp-list-table widefat widetable striped">';
             echo '<thead><tr><th>Title</th><th>Shortcode</th><th>Last Updated</th><th>Actions</th></tr></thead>';
             echo '<tbody>';
             foreach ($pages as $page) {
@@ -65,7 +76,7 @@ function notion_content_display_pages() {
                 echo '<tr>';
                 echo '<td>' . $title . '</td>';
                 echo '<td>';
-                echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 300px;"/> ';
+                echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 350px;"/> ';
                 echo '<button class="button copy-button" data-shortcode="' . esc_attr($shortcode) . '">Copy</button>';
                 echo '</td>';
                 echo '<td>' . $last_updated . '</td>';

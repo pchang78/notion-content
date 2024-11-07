@@ -124,9 +124,22 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         case 'bulleted_list_item':
             $text = notion_get_text($block['bulleted_list_item']['rich_text']);
-            $html = "<li>$text</li>";
+
+            $li_style = get_option('notion_content_style_li', '');
+            if(isset($li_style) && $li_style) {
+                $html = "<li class='$li_style'>$text</li>";
+            }
+            else {
+                $html = "<li>$text</li>";
+            }
             if($extra == "open") {
-                $html = "<ul>$html";
+                $ul_style = get_option('notion_content_style_ul', '');
+                if(isset($ul_style) && $ul_style) {
+                    $html = "<ul class='$ul_style'>$html";
+                }
+                else {
+                    $html = "<ul>$html";
+                }
             }
             break;
 
@@ -162,7 +175,14 @@ function notion_render_block($block, $api_key, $extra = "") {
 
 
         case 'table':
-            $html = "<table>\n";
+
+            $table_style = get_option('notion_content_style_table', '');
+            if(isset($table_style) && $table_style) {
+                $html = "<table class='$table_style'>\n";
+            }
+            else {
+                $html = "<table>\n";
+            }
             $table_content = notion_get_page_content($api_key, $blockID);
             $html .= $table_content;
             $html .= "</table>";

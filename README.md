@@ -51,7 +51,8 @@ You will need to setup a Notion
 - Dividers
 - Notion Simple Tables
 
+---
 
-## Coming Soon
-- Ability to add classes to different supported blocks
-- Custom Styles
+## Custom Styles
+
+You are not able to add custom classes and custom CSS.  Currenty you can only add classes to table and unorder list tags

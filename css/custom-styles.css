@@ -10,3 +10,7 @@
 .widetable {
     max-width: 100%;
 }
+
+.red-text {
+    color: red;
+}

@@ -15,6 +15,7 @@ define('NOTION_CONTENT_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 // Include required files
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-menu.php';
+require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/styles.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/settings.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/shortcode.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/notion-api.php';
