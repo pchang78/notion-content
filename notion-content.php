@@ -37,6 +37,7 @@ function notion_content_create_table() {
         page_id VARCHAR(255) NOT NULL UNIQUE,
         title VARCHAR(255) NOT NULL,
         content LONGTEXT NOT NULL,
+        images TEXT,
         is_active BOOLEAN DEFAULT TRUE,
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id)
