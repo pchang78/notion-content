@@ -281,21 +281,20 @@ function notion_content_refresh() {
         // Check if page exists in database
         $existing_page = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE page_id = %s", $page_id), ARRAY_A);
 
+
         if ($existing_page) {
-            // Update existing page
-            $wpdb->update(
-                $table_name,
-                ['title' => $title, 'content' => $content, 'is_active' => 1],
-                ['page_id' => $page_id]
-            );
+            if(!$existing_page['webhook_id']) {
+                $webhook_id = bin2hex(random_bytes(16)); // Generates a 32-character unique alphanumeric string
+                $wpdb->update( $table_name, ['title' => $title, 'content' => $content, 'is_active' => 1, 'webhook_id' => $webhook_id ], ['page_id' => $page_id]);
+            }
+            else {
+                // Update existing page
+                $wpdb->update( $table_name, ['title' => $title, 'content' => $content, 'is_active' => 1], ['page_id' => $page_id]);
+            }
         } else {
+            $webhook_id = bin2hex(random_bytes(16)); // Generates a 32-character unique alphanumeric string
             // Insert new page
-            $wpdb->insert($table_name, [
-                'page_id' => $page_id,
-                'title' => $title,
-                'content' => $content,
-                'is_active' => 1
-            ]);
+            $wpdb->insert($table_name, [ 'page_id' => $page_id, 'title' => $title, 'content' => $content, 'is_active' => 1, 'webhook_id' => $webhook_id ]);
         }
     }
 }
