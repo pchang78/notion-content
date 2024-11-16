@@ -102,24 +102,49 @@ function notion_render_block($block, $api_key, $extra = "") {
     $blockID = trim(str_replace("-", "", $block['id']));
     
     switch ($block['type']) {
+
         case 'paragraph':
             $text = notion_get_text($block['paragraph']['rich_text']);
-            $html = "<p>$text</p>";
+            $paragraph_style = get_option('notion_content_style_paragraph', '');
+            if(isset($paragraph_style) && $paragraph_style) {
+                $html = "<p class='$paragraph_style'>$text</p>";
+            }
+            else {
+                $html = "<p>$text</p>";
+            }
             break;
         
         case 'heading_1':
             $text = notion_get_text($block['heading_1']['rich_text']);
-            $html = "<h1>$text</h1>";
+            $heading1_style = get_option('notion_content_style_heading1', '');
+            if(isset($heading1_style) && $heading1_style) {
+                $html = "<h1 class='$heading1_style'>$text</h1>";
+            }
+            else {
+                $html = "<h1>$text</h1>";
+            }
             break;
 
         case 'heading_2':
             $text = notion_get_text($block['heading_2']['rich_text']);
-            $html = "<h2>$text</h2>";
+            $heading2_style = get_option('notion_content_style_heading2', '');
+            if(isset($heading2_style) && $heading2_style) {
+                $html = "<h2 class='$heading2_style'>$text</h2>";
+            }
+            else {
+                $html = "<h2>$text</h2>";
+            }
             break;
 
         case 'heading_3':
             $text = notion_get_text($block['heading_3']['rich_text']);
-            $html = "<h3>$text</h3>";
+            $heading3_style = get_option('notion_content_style_heading3', '');
+            if(isset($heading3_style) && $heading3_style) {
+                $html = "<h3 class='$heading3_style'>$text</h3>";
+            }
+            else {
+                $html = "<h3>$text</h3>";
+            }
             break;
 
         case 'bulleted_list_item':
@@ -166,16 +191,26 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         case 'quote':
             $text = notion_get_text($block['quote']['rich_text']);
-            $html = "<blockquote>$text</blockquote>";
+            $quote_style = get_option('notion_content_style_quote', '');
+            if(isset($quote_style) && $quote_style) {
+                $html = "<blockquote class='$quote_style'>$text</blockquote>";
+            }
+            else {
+                $html = "<blockquote>$text</blockquote>";
+            }
             break;
 
         case 'divider':
-            $html = "<hr>";
+            $hr_style = get_option('notion_content_style_hr', '');
+            if(isset($hr_style) && $hr_style) {
+                $html = "<hr class='$hr_style'>";
+            }
+            else {
+                $html = "<hr>";
+            }
             break;
 
-
         case 'table':
-
             $table_style = get_option('notion_content_style_table', '');
             if(isset($table_style) && $table_style) {
                 $html = "<table class='$table_style'>\n";
@@ -189,7 +224,13 @@ function notion_render_block($block, $api_key, $extra = "") {
             break;
 
         case 'table_row':
-            $html = "<tr>";
+            $row_style = get_option('notion_content_style_row', '');
+            if(isset($row_style) && $row_style) {
+                $html = "<tr class='$row_style'>";
+            }
+            else {
+                $html = "<tr>";
+            }
             $html .= notion_get_table_cells($block['table_row']['cells']);
             $html .= "</tr>";
             
@@ -207,8 +248,19 @@ function notion_render_block($block, $api_key, $extra = "") {
 function notion_get_table_cells($table_cells) {
     $text = '';
     foreach($table_cells AS $cell) {
-        $text .= '
-            <td>';
+
+
+        $col_style = get_option('notion_content_style_col', '');
+        if(isset($col_style) && $col_style) {
+            $text .= '
+                <td class="'. $col_style . '">';
+        }
+        else {
+            $text .= '
+                <td>';
+        }
+
+
         $text .= notion_get_text($cell, true);
         $text .= '</td>';
     }
