@@ -50,11 +50,11 @@ You will need to setup a Notion
 - Toggle
 - Dividers
 - Notion Simple Tables
+- Images (Uploaded images directly to Wordpress Media Library)
 
 ---
 
 ## Blocks / Features Coming Soon
-- Images (Uploaded images directly to Wordpress Media Library)
 - Column Layout in Notion
 - Add more instructions on how to setup API and page integration
 
