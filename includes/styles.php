@@ -9,7 +9,7 @@ function notion_content_styles_page() {
     if (isset($_POST['notion_content_styles_save'])) {
 
         // Save Classes styles
-        if(isset($_POST['table_style'])) {
+        if(isset($_POST['paragraph_style'])) {
             update_option('notion_content_style_paragraph', sanitize_text_field($_POST['paragraph_style']));
             update_option('notion_content_style_heading1', sanitize_text_field($_POST['heading1_style']));
             update_option('notion_content_style_heading2', sanitize_text_field($_POST['heading2_style']));
@@ -21,6 +21,7 @@ function notion_content_styles_page() {
             update_option('notion_content_style_li', sanitize_text_field($_POST['li_style']));
             update_option('notion_content_style_quote', sanitize_text_field($_POST['quote_style']));
             update_option('notion_content_style_hr', sanitize_text_field($_POST['hr_style']));
+            update_option('notion_content_style_img', sanitize_text_field($_POST['img_style']));
             echo '<div class="updated"><p>Styles updated successfully!</p></div>';
         }
         
@@ -44,6 +45,7 @@ function notion_content_styles_page() {
     $li_style = get_option('notion_content_style_li', '');
     $quote_style = get_option('notion_content_style_quote', '');
     $hr_style = get_option('notion_content_style_hr', '');
+    $img_style = get_option('notion_content_style_img', '');
 
     $custom_css = get_option('notion_content_custom_css', '');
 
@@ -148,6 +150,16 @@ function notion_content_styles_page() {
                             <?php endif; ?>
                         </td>
                     </tr>
+
+                    <tr>
+                        <th scope="row"><label for="img_style">Image Style (img)</label></th>
+                        <td><input type="text" id="img_style" name="img_style" value="<?php echo esc_attr($img_style); ?>" style="width: 100%;">
+                            <?php if($img_style) : ?>
+                            <br><small>Result: &lt;img class="<?php echo $hr_style; ?>"&gt;
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+
 
                     <tr>
                         <th scope="row"><label for="quote_style">Block Quote Style (blockquote)</label></th>

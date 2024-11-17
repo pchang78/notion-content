@@ -40,6 +40,23 @@ function notion_content_create_table() {
     dbDelta($sql);
 }
 
+register_activation_hook(__FILE__, 'notion_create_images_table');
+function notion_create_images_table() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'notion_images';
+    $charset_collate = $wpdb->get_charset_collate();
+    // SQL to create the table
+    $sql = "CREATE TABLE $table_name (
+        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        object_id VARCHAR(255) NOT NULL,
+        post_id BIGINT(20) UNSIGNED NOT NULL,
+        PRIMARY KEY  (id),
+        UNIQUE KEY unique_object (object_id)
+    ) $charset_collate;";
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+}
+
 
 function notion_content_admin_msg($message) {
 ?>

@@ -149,7 +149,6 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         case 'bulleted_list_item':
             $text = notion_get_text($block['bulleted_list_item']['rich_text']);
-
             $li_style = get_option('notion_content_style_li', '');
             if(isset($li_style) && $li_style) {
                 $html = "<li class='$li_style'>$text</li>";
@@ -236,6 +235,18 @@ function notion_render_block($block, $api_key, $extra = "") {
             
             break;
 
+        case 'image':
+            $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
+            $image_url = wp_get_attachment_url($attachment_id);
+            $img_style = get_option('notion_content_style_img', '');
+            if(isset($img_style) && $img_style) {
+                $html = "<img class='$img_style' src='$image_url'>";
+            }
+            else {
+                $html = "<img src='$image_url'>";
+            }
+            break;
+
 
         default:
             $html = "<p>[Unsupported block type: {$block['type']}]</p>";
@@ -248,8 +259,6 @@ function notion_render_block($block, $api_key, $extra = "") {
 function notion_get_table_cells($table_cells) {
     $text = '';
     foreach($table_cells AS $cell) {
-
-
         $col_style = get_option('notion_content_style_col', '');
         if(isset($col_style) && $col_style) {
             $text .= '
@@ -259,15 +268,11 @@ function notion_get_table_cells($table_cells) {
             $text .= '
                 <td>';
         }
-
-
         $text .= notion_get_text($cell, true);
         $text .= '</td>';
     }
     return $text;
 }
-
-
 
 function notion_get_text($rich_text_array, $add_breaks = false) {
     $text = '';
@@ -301,8 +306,6 @@ function notion_get_text($rich_text_array, $add_breaks = false) {
 
     return $text;
 }
-
-
 
 function notion_content_refresh() {
     global $wpdb;
@@ -350,7 +353,6 @@ function notion_content_refresh() {
         }
     }
 }
-
 
 function notion_content_refresh_single_page($page_id) {
     global $wpdb;
@@ -416,7 +418,6 @@ function notion_get_page_title($api_key, $page_id) {
             'Notion-Version' => '2022-06-28'
         ]
     ]);
-
     if (is_wp_error($response)) {
         return $response;
     }
@@ -435,3 +436,80 @@ function notion_get_page_title($api_key, $page_id) {
     return 'Untitled Page'; // Default if no title is found
 }
 
+function notion_handle_image($object_id, $image_url) {
+    global $wpdb;
+
+    $images_table = $wpdb->prefix . 'notion_images';
+
+    // Check if there's an entry in the `notion_images` table for this `object_id`
+    $image_entry = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $images_table WHERE object_id = %s",
+        $object_id
+    ));
+
+    // Check if the file exists in the WordPress Media Library
+    if ($image_entry) {
+        $post_id = $image_entry->post_id;
+
+        // Check if attachment exists in the posts table
+        $attachment = get_post($post_id);
+
+        // Verify the file still exists in the upload directory
+        $file_path = get_attached_file($post_id);
+
+        if ($attachment && file_exists($file_path)) {
+            // File and attachment exist, return the post_id
+            return $post_id;
+        }
+
+        // If the attachment or file doesn't exist, delete the entry
+        $wpdb->delete($images_table, array('object_id' => $object_id), array('%s'));
+    }
+
+    // Use `download_url` to download the image
+    $temp_file = download_url($image_url);
+
+    if (is_wp_error($temp_file)) {
+        return new WP_Error('image_download_failed', 'Failed to download the image.');
+    }
+
+    // Move the downloaded file to the WordPress upload directory
+    $uploads_dir = wp_upload_dir();
+
+    $parsed_url = parse_url($image_url);
+    $filename = basename($parsed_url['path']); // Extract just the filename from the URL path
+    $destination = $uploads_dir['path'] . '/' . $filename;
+
+    if (!rename($temp_file, $destination)) {
+        unlink($temp_file); // Clean up temp file if move fails
+        return new WP_Error('file_move_failed', 'Failed to move the downloaded file to the upload directory.');
+    }
+
+    // Add the image to the WordPress Media Library
+    $attachment = array(
+        'post_mime_type' => wp_check_filetype($filename)['type'],
+        'post_title' => sanitize_file_name($filename),
+        'post_content' => '',
+        'post_status' => 'inherit',
+    );
+
+    $attachment_id = wp_insert_attachment($attachment, $destination);
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    // Generate attachment metadata
+    $attachment_data = wp_generate_attachment_metadata($attachment_id, $destination);
+    wp_update_attachment_metadata($attachment_id, $attachment_data);
+
+    // Insert a new entry
+    $wpdb->insert(
+        $images_table,
+        array(
+            'object_id' => $object_id,
+            'post_id' => $attachment_id,
+        ),
+        array('%s', '%s', '%d')
+    );
+
+    // Return the new post_id
+    return $attachment_id;
+}
