@@ -64,16 +64,14 @@ function notion_content_admin_msg($message) {
 <?php
 }
 
-
 function notion_content_enqueue_styles() {
     wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
 }
 add_action('admin_enqueue_scripts', 'notion_content_enqueue_styles');
 
-
 // Add Settings link to the plugin action links
 function notion_content_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=notion-content-settings') . '">Settings</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=notion-content-settings&tab=setup') . '">Settings</a>';
     array_unshift($links, $settings_link); // Adds the link to the beginning of the array
     return $links;
 }

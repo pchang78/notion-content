@@ -237,7 +237,15 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
-            $image_url = wp_get_attachment_url($attachment_id);
+
+            $image_size = get_option('notion_image_size');
+            if(!isset($image_size) || !$image_size || $image_size == "full") {
+                $image_url = wp_get_attachment_url($attachment_id);
+            }
+            else {
+                $image_src = wp_get_attachment_image_src($attachment_id, $image_size);
+                $image_url = $image_src[0];
+            }
             $img_style = get_option('notion_content_style_img', '');
             if(isset($img_style) && $img_style) {
                 $html = "<img class='$img_style' src='$image_url'>";
