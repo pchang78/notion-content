@@ -69,7 +69,13 @@ function notion_content_display_settings() {
 
             <table class="form-table">
                 <tr valign="top">
-                    <th scope="row">Image Size</th>
+                    <th scope="row">Image Size
+                        <span class="help-tip" title="Determine which image size to be displayed on your wordpress page.">
+                            <span class="dashicons dashicons-editor-help"></span>
+                         </span>
+
+
+                    </th>
                     <td>
                         
                     <select name="notion_image_size">
@@ -93,12 +99,22 @@ function notion_content_display_settings() {
             <input type="hidden" name="notion_image_size" value="<?php echo esc_attr(get_option('notion_image_size')); ?>" />
             <table class="form-table">
                 <tr valign="top">
-                    <th scope="row">Notion API Key</th>
+                    <th scope="row">
+                        Notion API Key
+                        <span class="help-tip" title="Internal Integration Secret found in Notion in the Notion Developers site">
+                             <span class="dashicons dashicons-editor-help"></span>
+                        </span>
+
+                    </th>
                     <td><input type="text" name="notion_api_key" value="<?php echo esc_attr(get_option('notion_api_key')); ?>" class="widefat" /></td>
                 </tr>
                 
                 <tr valign="top">
-                    <th scope="row">Notion Database URL</th>
+                    <th scope="row">Notion Database URL
+                    <span class="help-tip" title="The full URL of the Notion database (not just the ID)">
+                        <span class="dashicons dashicons-editor-help"></span>
+                    </span>
+                    </th>
                     <td><input type="text" name="notion_database_url" value="<?php echo esc_attr(get_option('notion_database_url')); ?>" class="widefat" /></td>
                 </tr>
             </table>

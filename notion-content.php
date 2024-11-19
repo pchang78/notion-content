@@ -66,6 +66,8 @@ function notion_content_admin_msg($message) {
 
 function notion_content_enqueue_styles() {
     wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
+    wp_enqueue_style('notion-content-tooltip', plugin_dir_url(__FILE__) . 'css/tooltip.css', array(), '1.0.0');
+
 }
 add_action('admin_enqueue_scripts', 'notion_content_enqueue_styles');
 

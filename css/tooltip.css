@@ -1,0 +1,44 @@
+.help-tip {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+    color: #555;
+}
+
+.help-tip .dashicons {
+    font-size: 18px;
+    vertical-align: middle;
+}
+
+.help-tip:hover::after {
+    content: attr(title); /* Use the `title` attribute for the tooltip */
+    position: absolute;
+    top: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    z-index: 9999;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.help-tip:hover {
+    text-decoration: none;
+}
+
+.help-tip:hover::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+    z-index: 9999;
+}
