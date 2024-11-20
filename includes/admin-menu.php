@@ -65,7 +65,19 @@ function notion_content_display_pages() {
 
         if ($pages) {
             echo '<table class="wp-list-table widefat widetable striped">';
-            echo '<thead><tr><th>Title</th><th>Shortcode</th><th>Last Updated</th><th>Actions</th></tr></thead>';
+            echo '<thead>
+            <tr>
+                <th>Title</th>
+                <th>Shortcode</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+                <th>Auto Update Interval
+                    <span class="help-tip" title="Automatic refreshing content from Notion.">
+                             <span class="dashicons dashicons-editor-help"></span>
+                    </span>
+                </th>
+            </tr>
+            </thead>';
             echo '<tbody>';
             foreach ($pages as $page) {
                 $title = esc_html($page['title']);
@@ -86,6 +98,23 @@ function notion_content_display_pages() {
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
                 echo '</form>';
                 echo '</td>';
+
+                ?>
+
+                <td>
+                <select class="cron-interval" data-page-id="<?php echo esc_attr($page['page_id']); ?>">
+                    <option value="manual" <?php selected($page['cron_interval'], 'manual'); ?>>Manual</option>
+                    <option value="15_minutes" <?php selected($page['cron_interval'], '15_minutes'); ?>>Every 15 Minutes</option>
+                    <option value="30_minutes" <?php selected($page['cron_interval'], '30_minutes'); ?>>Every 30 Minutes</option>
+                    <option value="1_hour" <?php selected($page['cron_interval'], '1_hour'); ?>>Every Hour</option>
+                    <option value="6_hours" <?php selected($page['cron_interval'], '6_hours'); ?>>Every 6 Hours</option>
+                    <option value="12_hours" <?php selected($page['cron_interval'], '12_hours'); ?>>Every 12 Hours</option>
+                    <option value="once_a_day" <?php selected($page['cron_interval'], 'once_a_day'); ?>>Once a Day</option>
+                </select>
+                </td>
+
+
+            <?php
                 echo '</tr>';
             }
             echo '</tbody>';
@@ -95,6 +124,12 @@ function notion_content_display_pages() {
         }
         ?>
     </div>
+
+
+    <div id="loading-overlay">
+        <div class="loading-message">Updating, please wait...</div>
+    </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

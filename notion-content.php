@@ -17,6 +17,7 @@ require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/styles.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/settings.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/shortcode.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/notion-api.php';
+require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/ajax-handler.php';
 
 
 // Activate plugin and create custom table
@@ -32,9 +33,13 @@ function notion_content_create_table() {
         content LONGTEXT NOT NULL,
         images TEXT,
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        cron_interval varchar(50) NOT NULL DEFAULT 'manual',
         is_active TINYINT(1) DEFAULT 1,
         webhook_id VARCHAR(255) UNIQUE,
-        PRIMARY KEY  (id)
+        PRIMARY KEY  (id),
+        INDEX idx_page_id (page_id),
+        INDEX idx_is_active (is_active),
+        INDEX idx_cron_interval (cron_interval)
     ) $charset_collate;";
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
@@ -63,6 +68,16 @@ function notion_content_admin_msg($message) {
     <div class="notice notice-success is-dismissible"> <p><?php echo $message; ?></p> </div>
 <?php
 }
+
+
+function notion_enqueue_scripts($hook) {
+    wp_enqueue_script('notion-cron-script', plugins_url('js/notion-cron.js', __FILE__), array('jquery'), '1.0', true);
+    wp_localize_script('notion-cron-script', 'notionCronAjax', array(
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'nonce'    => wp_create_nonce('notion_cron_nonce')
+    ));
+}
+add_action('admin_enqueue_scripts', 'notion_enqueue_scripts');
 
 function notion_content_enqueue_styles() {
     wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
