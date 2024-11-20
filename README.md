@@ -61,4 +61,9 @@ You will need to setup a Notion
 ---
 
 ## Custom Styles
-You are now able to add custom classes and custom CSS.  Currenty you can only add classes to table and unorder list tags
+You can add custom classes and custom CSS.  
+
+---
+
+## Automatic Content Refresh
+You can now set content to refresh automatically using WP-Cron.  Intervals can be set for 15 Minutes, 30 Minutes, 1 Hour, 6 Hours, 12 Hours, or once a day.  
