@@ -51,7 +51,7 @@ function notion_content_styles_page() {
 
     // Display the tab interface
     ?>
-    <div class="wrap">
+    <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Content Styles</h1>
         
         <!-- Tab Navigation -->

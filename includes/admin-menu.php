@@ -49,7 +49,7 @@ function notion_content_display_pages() {
     }
 
     ?>
-    <div class="wrap">
+    <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Pages</h1>
         
         <form method="post">

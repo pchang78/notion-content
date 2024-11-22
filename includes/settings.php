@@ -47,7 +47,7 @@ function notion_content_display_settings() {
     settings_errors('notion_content_messages');
 
     ?>
-    <div class="wrap">
+    <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Content Settings</h1>
 
 

@@ -1,5 +1,5 @@
 /* css/custom-styles.css */
-.widefat {
+#notion-content-plugin-admin .widefat {
     width: 100%; /* Makes the text fields use full width */
     max-width: 900px; /* Set a maximum width if desired */
     min-height: 40px; /* Adjust height if necessary */
@@ -7,11 +7,11 @@
 }
 
 
-.widetable {
+#notion-content-plugin-admin .widetable {
     max-width: 100%;
 }
 
-.red-text {
+#notion-content-plugin-admin .red-text {
     color: red;
 }
 
@@ -26,7 +26,7 @@
     display: none;
 }
 
-.loading-message {
+#notion-content-plugin-admin .loading-message {
     position: absolute;
     top: 50%;
     left: 50%;
