@@ -22,13 +22,19 @@ function notion_content_styles_page() {
             update_option('notion_content_style_quote', sanitize_text_field($_POST['quote_style']));
             update_option('notion_content_style_hr', sanitize_text_field($_POST['hr_style']));
             update_option('notion_content_style_img', sanitize_text_field($_POST['img_style']));
-            echo '<div class="updated"><p>Styles updated successfully!</p></div>';
+            echo '<div class="updated">
+                <p>Styles updated successfully!</p>
+                <p>You must refresh your content for the styles to be applied.</p>
+            </div>';
         }
         
         // Save Custom CSS
         if(isset($_POST['custom_css'])) {
             update_option('notion_content_custom_css', wp_strip_all_tags($_POST['custom_css']));
-            echo '<div class="updated"><p>Custom CSS updated successfully!</p></div>';
+            echo '<div class="updated">
+                <p>Custom CSS updated successfully!</p>
+                <p>You must refresh your content for the custom CSS to be applied.</p>
+            </div>';
         }
 
     }

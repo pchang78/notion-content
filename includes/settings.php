@@ -34,14 +34,12 @@ function get_all_image_sizes() {
     $filtered_sizes["full"] = "Full Size";
     return $filtered_sizes;
 
-
-
 }
 
 function notion_content_display_settings() {
 
     if (isset($_GET['settings-updated'])) {
-        add_settings_error('notion_content_messages', 'notion_content_message', 'Settings have been saved.', 'updated');
+        add_settings_error('notion_content_messages', 'notion_content_message', 'Settings have been saved. <p>In order for your settings to take into effect, you must refresh your content.</p>', 'updated');
     }
 
     settings_errors('notion_content_messages');
