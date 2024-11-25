@@ -7,6 +7,7 @@ function notion_content_register_settings() {
     register_setting('notion_content_settings_group', 'notion_content_api_key');
     register_setting('notion_content_settings_group', 'notion_content_database_url');
     register_setting('notion_content_settings_group', 'notion_content_image_size');
+    register_setting('notion_content_settings_group', 'notion_content_column_tag');
 }
 
 function get_all_image_sizes() {
@@ -66,13 +67,12 @@ function notion_content_display_settings() {
             <input type="hidden" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" />
 
             <table class="form-table">
+
                 <tr valign="top">
                     <th scope="row">Image Size
                         <span class="help-tip" title="Determine which image size to be displayed on your wordpress page.">
                             <span class="dashicons dashicons-editor-help"></span>
                          </span>
-
-
                     </th>
                     <td>
                         
@@ -88,13 +88,33 @@ function notion_content_display_settings() {
                         <option value='<?php echo $name; ?>' <?php selected($selected_option, $name); ?>><?php echo $label; ?></option>
                     <?php endforeach; ?>
                     </select>
-                </td>
+                    </td>
                 </tr>
+
+                <tr valign="top">
+                    <th scope="row">Notion Columns
+                        <span class="help-tip" title="Convert Notion columns into div or table tags">
+                            <span class="dashicons dashicons-editor-help"></span>
+                         </span>
+                    </th>
+                    <td>
+                        
+                    <?php
+                        $selected_tag_option = esc_attr(get_option('notion_content_column_tag'));
+                    ?>
+                    <select name="notion_content_column_tag">
+                        <option name='div' value='div' <?php selected($selected_tag_option, 'div'); ?>>Div </option>
+                        <option name='table' value='table' <?php selected($selected_tag_option, 'table'); ?>>Table </option>
+                    </select>
+                    </td>
+                </tr>
+
             </table>
 
         <?php elseif ($_GET['tab'] === 'setup') : ?>
 
             <input type="hidden" name="notion_content_image_size" value="<?php echo esc_attr(get_option('notion_content_image_size')); ?>" />
+            <input type="hidden" name="notion_content_column_tag" value="<?php echo esc_attr(get_option('notion_content_column_tag')); ?>" />
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">

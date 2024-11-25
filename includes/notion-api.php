@@ -39,7 +39,7 @@ function notion_get_pages($api_key, $database_id) {
 }
 
 // Fetch and render individual Notion page content as HTML
-function notion_get_page_content($api_key, $page_id) {
+function notion_get_page_content($api_key, $page_id, $debug = false) {
     $url = "https://api.notion.com/v1/blocks/$page_id/children";
     $response = wp_remote_get($url, [
         'headers' => [
@@ -53,6 +53,11 @@ function notion_get_page_content($api_key, $page_id) {
     }
 
     $body = json_decode(wp_remote_retrieve_body($response), true);
+    if($debug) {
+        echo "<pre>";
+        print_r($body);
+        echo "</pre>";
+    }
     $bulleted_list_item = false;
     $numbered_list_item = false;
     
@@ -232,12 +237,10 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             $html .= notion_get_table_cells($block['table_row']['cells']);
             $html .= "</tr>";
-            
             break;
 
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
-
             $image_size = get_option('notion_content_image_size');
             if(!isset($image_size) || !$image_size || $image_size == "full") {
                 $image_url = wp_get_attachment_url($attachment_id);
@@ -255,6 +258,72 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        case "column_list":
+            $column_tag = get_option('notion_content_column_tag');
+            if($column_tag == 'div') {
+
+                $col_div_wrapper_style = get_option('notion_content_style_column_div_wrapper', '');
+                if(isset($col_div_wrapper_style) && $col_div_wrapper_style) {
+                    $html = "<div class='$col_div_wrapper_style'>";
+                }
+                else {
+                    $html = "<div>";
+                }
+            }
+            else {
+                $col_table_style = get_option('notion_content_style_column_table', '');
+                if(isset($col_table_style) && $col_table_style) {
+                    $html = "<table class='$col_table_style'>";
+                }
+                else {
+                    $html = "<table>";
+                }
+
+                $col_row_style = get_option('notion_content_style_column_row', '');
+                if(isset($col_row_style) && $col_row_style) {
+                    $html .= "<tr class='$col_row_style'>";
+                }
+                else {
+                    $html .= "<tr>";
+                }
+            }
+            $html .= notion_get_page_content($api_key, $blockID);
+            if($column_tag == 'div') {
+                $html .= "</div>";
+            }
+            else {
+                $html .= "</tr></table>";
+            }
+            break;
+
+        case "column":
+            $column_tag = get_option('notion_content_column_tag');
+            if($column_tag == 'div') {
+                $col_div_style = get_option('notion_content_style_column_div', '');
+                if(isset($col_div_style) && $col_div_style) {
+                    $html = "<div class='$col_div_style'>";
+                }
+                else {
+                    $html = "<div>";
+                }
+            }
+            else {
+                $col_col_style = get_option('notion_content_style_column_col', '');
+                if(isset($col_col_style) && $col_col_style) {
+                    $html = "<td class='$col_col_style'>";
+                }
+                else {
+                    $html = "<td>";
+                }
+            }
+            $html .= notion_get_page_content($api_key, $blockID);
+            if($column_tag == 'div') {
+                $html .= "</div>";
+            }
+            else {
+                $html .= "</td>";
+            }
+            break;
 
         default:
             $html = "<p>[Unsupported block type: {$block['type']}]</p>";
