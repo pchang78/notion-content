@@ -4,9 +4,9 @@
 add_action('admin_init', 'notion_content_register_settings');
 
 function notion_content_register_settings() {
-    register_setting('notion_content_settings_group', 'notion_api_key');
-    register_setting('notion_content_settings_group', 'notion_database_url');
-    register_setting('notion_content_settings_group', 'notion_image_size');
+    register_setting('notion_content_settings_group', 'notion_content_api_key');
+    register_setting('notion_content_settings_group', 'notion_content_database_url');
+    register_setting('notion_content_settings_group', 'notion_content_image_size');
 }
 
 function get_all_image_sizes() {
@@ -62,8 +62,8 @@ function notion_content_display_settings() {
         <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'general') : ?>
 
 
-            <input type="hidden" name="notion_api_key" value="<?php echo esc_attr(get_option('notion_api_key')); ?>" />
-            <input type="hidden" name="notion_database_url" value="<?php echo esc_attr(get_option('notion_database_url')); ?>" />
+            <input type="hidden" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" />
+            <input type="hidden" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" />
 
             <table class="form-table">
                 <tr valign="top">
@@ -76,10 +76,10 @@ function notion_content_display_settings() {
                     </th>
                     <td>
                         
-                    <select name="notion_image_size">
+                    <select name="notion_content_image_size">
                     <?php
                         $image_sizes = get_all_image_sizes();
-                        $selected_option = esc_attr(get_option('notion_image_size'));
+                        $selected_option = esc_attr(get_option('notion_content_image_size'));
                         if(!isset($selected_option) || !$selected_option) {
                             $selected_option = "full";
                         }
@@ -94,7 +94,7 @@ function notion_content_display_settings() {
 
         <?php elseif ($_GET['tab'] === 'setup') : ?>
 
-            <input type="hidden" name="notion_image_size" value="<?php echo esc_attr(get_option('notion_image_size')); ?>" />
+            <input type="hidden" name="notion_content_image_size" value="<?php echo esc_attr(get_option('notion_content_image_size')); ?>" />
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">
@@ -104,7 +104,7 @@ function notion_content_display_settings() {
                         </span>
 
                     </th>
-                    <td><input type="text" name="notion_api_key" value="<?php echo esc_attr(get_option('notion_api_key')); ?>" class="widefat" /></td>
+                    <td><input type="text" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" class="widefat" /></td>
                 </tr>
                 
                 <tr valign="top">
@@ -113,7 +113,7 @@ function notion_content_display_settings() {
                         <span class="dashicons dashicons-editor-help"></span>
                     </span>
                     </th>
-                    <td><input type="text" name="notion_database_url" value="<?php echo esc_attr(get_option('notion_database_url')); ?>" class="widefat" /></td>
+                    <td><input type="text" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" class="widefat" /></td>
                 </tr>
             </table>
             

@@ -238,7 +238,7 @@ function notion_render_block($block, $api_key, $extra = "") {
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
 
-            $image_size = get_option('notion_image_size');
+            $image_size = get_option('notion_content_image_size');
             if(!isset($image_size) || !$image_size || $image_size == "full") {
                 $image_url = wp_get_attachment_url($attachment_id);
             }
@@ -322,8 +322,8 @@ function notion_content_refresh() {
     // Set all pages to inactive
     $wpdb->update($table_name, ['is_active' => 0], ['is_active' => 1]);
 
-    $api_key = get_option('notion_api_key');
-    $database_url = get_option('notion_database_url');
+    $api_key = get_option('notion_content_api_key');
+    $database_url = get_option('notion_content_database_url');
     $database_id = notion_extract_database_id($database_url);
 
     if (!$api_key || !$database_id) {
@@ -367,7 +367,7 @@ function notion_content_refresh_single_page($page_id) {
     $table_name = $wpdb->prefix . 'notion_content';
 
     // Retrieve API key
-    $api_key = get_option('notion_api_key');
+    $api_key = get_option('notion_content_api_key');
     if (!$api_key) {
         return new WP_Error('notion_content_error', 'API Key is missing.');
     }
