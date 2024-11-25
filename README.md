@@ -54,16 +54,20 @@ You will need to setup a Notion
 
 ---
 
-## Blocks / Features Coming Soon
-- Column Layout in Notion
-- Add more instructions on how to setup API and page integration
-
----
-
 ## Custom Styles
 You can add custom classes and custom CSS.  
 
 ---
 
+## Notion Columns
+Support for simple Notion columns.  Columns occur when you dragging and dropping blocks of content side by side in Notion. 
+
+---
+
 ## Automatic Content Refresh
 You can now set content to refresh automatically using WP-Cron.  Intervals can be set for 15 Minutes, 30 Minutes, 1 Hour, 6 Hours, 12 Hours, or once a day.  
+
+---
+
+## Coming Soon
+- Add more instructions on how to setup API and page integration
