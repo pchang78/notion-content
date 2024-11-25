@@ -123,12 +123,14 @@ function notion_content_display_pages() {
             echo '<p>No active pages found.</p>';
         }
         ?>
+
+	    <div id="loading-overlay">
+		<div class="loading-message">Updating, please wait...</div>
+	    </div>
+
     </div>
 
 
-    <div id="loading-overlay">
-        <div class="loading-message">Updating, please wait...</div>
-    </div>
 
 
     <script>

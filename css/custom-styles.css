@@ -15,7 +15,7 @@
     color: red;
 }
 
-#loading-overlay {
+#notion-content-plugin-admin #loading-overlay {
     position: fixed;
     top: 0;
     left: 0;
