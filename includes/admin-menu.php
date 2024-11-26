@@ -96,6 +96,8 @@ function notion_content_display_pages() {
                 echo '<form method="post" style="display:inline;">';
                 echo '<input type="hidden" name="page_id" value="' . $page_id . '">';
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
+                $preview_url = plugin_dir_url(__FILE__) . '../preview.php?id=' . urlencode($page_id);
+                echo '<a href="' . $preview_url . '" class="button" target="_blank">Preview</a>';
                 echo '</form>';
                 echo '</td>';
 
