@@ -45,6 +45,9 @@ function notion_content_display_settings() {
 
     settings_errors('notion_content_messages');
 
+
+    include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
+
     ?>
     <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Content Settings</h1>

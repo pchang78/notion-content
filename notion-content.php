@@ -80,8 +80,12 @@ function notion_enqueue_scripts($hook) {
 add_action('admin_enqueue_scripts', 'notion_enqueue_scripts');
 
 function notion_content_enqueue_styles() {
-    wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
-    wp_enqueue_style('notion-content-tooltip', plugin_dir_url(__FILE__) . 'css/tooltip.css', array(), '1.0.0');
+    $screen = get_current_screen();
+
+    if ($screen && ($screen->id === 'toplevel_page_notion-content' || strpos($screen->id, 'notion-content') !== false)) {
+        wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
+        wp_enqueue_style('notion-content-tooltip', plugin_dir_url(__FILE__) . 'css/tooltip.css', array(), '1.0.0');
+    }
 
 }
 add_action('admin_enqueue_scripts', 'notion_content_enqueue_styles');

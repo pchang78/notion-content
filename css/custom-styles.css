@@ -1,4 +1,10 @@
 /* css/custom-styles.css */
+
+#notion-content-plugin-admin {
+    padding: 5px 20px;
+}
+
+
 #notion-content-plugin-admin .widefat {
     width: 100%; /* Makes the text fields use full width */
     max-width: 900px; /* Set a maximum width if desired */
@@ -34,4 +40,69 @@
     color: #fff;
     font-size: 18px;
     font-weight: bold;
+}
+
+
+.notion-content-header {
+    background-color: #2e65a8; /* Dark blue background */
+    color: white;
+    width: 100%;
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.notion-content-header-inner {
+    max-width: 100%; /* Ensure it spans the full content width */
+    padding: 5px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notion-content-logo {
+    height: 50px; /* Adjust to fit desired size */
+    max-height: 100%; /* Prevent overflowing */
+    width: auto; /* Maintain aspect ratio */
+    margin-right: 20px; /* Spacing between logo and title */
+}
+
+
+.notion-content-title {
+    font-size: 24px;
+    margin: 0;
+    font-weight: bold;
+    flex-grow: 1; /* Push navigation to the right */
+    color: white;
+
+
+}
+.notion-content-nav a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: #ffffff; /* White text for links */
+    font-weight: 500;
+}
+.notion-content-nav a:hover {
+    text-decoration: underline;
+}
+.notion-content-nav a.active {
+    font-weight: bold;
+    color: #ffcc00; /* Highlighted tab color */
+}
+.notion-content-body {
+    margin: 0;
+    padding: 20px;
+    background: #ffffff;
+}
+
+
+/* Remove extra margin between admin menu and plugin header */
+#wpcontent {
+    padding-left: 0 !important;
+}
+.notion-content-header {
+    margin-left: 0 !important;
 }

@@ -48,6 +48,10 @@ function notion_content_display_pages() {
         notion_content_admin_msg("Content " . $page_id . " updated");
     }
 
+
+    include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
+
+
     ?>
     <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Pages</h1>

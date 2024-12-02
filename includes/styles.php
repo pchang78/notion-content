@@ -66,6 +66,10 @@ function notion_content_styles_page() {
 
     $custom_css = get_option('notion_content_custom_css', '');
 
+
+
+    include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
+
     // Display the tab interface
     ?>
     <div class="wrap" id="notion-content-plugin-admin">
