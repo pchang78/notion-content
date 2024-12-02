@@ -47,8 +47,8 @@
     background-color: #2e65a8; /* Dark blue background */
     color: white;
     width: 100%;
-    position: relative;
-    top: 0;
+    position: sticky;
+    top: 32px;
     left: 0;
     margin: 0;
     padding: 0;
@@ -74,11 +74,20 @@
     font-size: 24px;
     margin: 0;
     font-weight: bold;
-    flex-grow: 1; /* Push navigation to the right */
     color: white;
 
 
 }
+
+.notion-content-nav  {
+    display: flex;
+    justify-content: flex-start; /* Aligns the nav items to the left */
+    flex-grow: 1; /* Allows the nav to expand and take available space */
+    margin-left: 20px;
+
+}
+
+
 .notion-content-nav a {
     margin-left: 15px;
     text-decoration: none;
