@@ -21,6 +21,22 @@ require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/notion-api.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/ajax-handler.php';
 
 
+
+
+// Code of debugging startup configurations
+/*
+if(isset($_POST["notion_content_check_config"]) && $_POST["notion_content_check_config"]) {
+        $api_key = $_POST["notion_content_api_key"];
+        $pageID = notion_extract_database_id($_POST["notion_content_database_url"]);
+        notion_content_check_notion_config($api_key, $pageID);
+
+    exit;
+}
+    */
+
+
+
+
 // Activate plugin and create custom table
 register_activation_hook(__FILE__, 'notion_content_create_table');
 function notion_content_create_table() {
