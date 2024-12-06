@@ -5,6 +5,16 @@ function notion_content_styles_page() {
         wp_die(__('You do not have sufficient permissions to access this page.'));
     }
 
+
+      // API and URL not setup yet
+      if(!notion_content_is_setup()) {
+        notion_content_setup_page();
+        return;
+    }
+
+
+
+
     // Save form data when submitted
     if (isset($_POST['notion_content_styles_save'])) {
 

@@ -12,7 +12,8 @@ if (!defined('ABSPATH')) exit; // Exit if accessed directly
 define('NOTION_CONTENT_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
 // Include required files
-require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-menu.php';
+require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/plugin-startup.php';
+require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/notion-pages.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/styles.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/settings.php';
 require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/shortcode.php';
@@ -61,6 +62,43 @@ function notion_create_images_table() {
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
+
+
+add_action('admin_menu', 'notion_content_admin_menu');
+function notion_content_admin_menu() {
+
+    add_menu_page(
+        'Notion Content',
+        'Notion Content',
+        'manage_options',
+        'notion-content',
+        'notion_content_display_pages',
+        plugins_url('assets/notion-content-icon.png', __FILE__),
+        20
+    );
+
+    add_submenu_page(
+        'notion-content', // Parent slug
+        'Styles',                  // Page title
+        'Styles',                  // Menu title
+        'manage_options',          // Capability
+        'notion-content-styles',   // Menu slug
+        'notion_content_styles_page' // Function to display the styles page
+    );
+
+    add_submenu_page(
+        'notion-content',
+        'Settings',
+        'Settings',
+        'manage_options',
+        'notion-content-settings',
+        'notion_content_display_settings'
+    );
+
+}
+
+
+
 
 
 function notion_content_admin_msg($message) {

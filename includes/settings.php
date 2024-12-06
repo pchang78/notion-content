@@ -39,6 +39,12 @@ function get_all_image_sizes() {
 
 function notion_content_display_settings() {
 
+    // API and URL not setup yet
+    if(!notion_content_is_setup()) {
+        notion_content_setup_page();
+        return;
+    }
+
     if (isset($_GET['settings-updated'])) {
         add_settings_error('notion_content_messages', 'notion_content_message', 'Settings have been saved. <p>In order for your settings to take into effect, you must refresh your content.</p>', 'updated');
     }

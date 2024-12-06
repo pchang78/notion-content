@@ -6,9 +6,12 @@
     <?php
     $current_page = isset($_GET['page']) ? $_GET['page'] : '';
     ?>
+    <?php if(notion_content_is_setup()) : ?>
+
             <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content')); ?>" class="<?php echo $current_page === 'notion-content' ? 'active' : ''; ?>">Pages</a>
             <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content-styles')); ?>" class="<?php echo $current_page === 'notion-content-styles' ? 'active' : ''; ?>">Styles</a>
             <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content-settings')); ?>" class="<?php echo $current_page === 'notion-content-settings' ? 'active' : ''; ?>">Settings</a>
+    <?php endif; ?>
 
 
                 </nav>
