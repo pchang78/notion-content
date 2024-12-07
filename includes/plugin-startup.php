@@ -89,6 +89,7 @@ function notion_content_setup_page() {
                 // Check to see if there are child databases and then list them.  If there are not, then give an error message.  
                 if(count($results["databases"]) > 0) {
                     // Show list of databases
+                    $msg = "Show list of databases";
                 }
                 else {
                     $msg = "No databases found on the given URL";
@@ -105,21 +106,21 @@ function notion_content_setup_page() {
 
     }
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
-
-
-    if(isset($msg) && $msg) {
-        ?>
+    ?>
+    <?php if(isset($msg) && $msg) : ?>
     <div class="notice notice-error is-dismissible">
         <p><?php _e($msg, 'notion-content'); ?></p>
     </div>
-<?php
-    }
+    <?php endif; ?>
 
 
+    <?php
+    $api_key = "";
     if(isset($_POST["notion_content_api_key"])) {
         $api_key = $_POST["notion_content_api_key"];
     }
 
+    $database_url = "";
     if(isset($_POST["notion_content_database_url"])) {
         $database_url = $_POST["notion_content_database_url"];
     }
@@ -128,35 +129,31 @@ function notion_content_setup_page() {
     ?>
 
     <div class="wrap" id="notion-content-plugin-admin">
-            <h1>Notion Content Setup</h1>
-
-
-            <form method="post" action="">
-            <input type="hidden" name="notion_content_check_config" value="1">
-            <table class="form-table">
-                <tr valign="top">
-                    <th scope="row">
-                        Notion API Key
-                        <span class="help-tip" title="Internal Integration Secret found in Notion in the Notion Developers site">
-                             <span class="dashicons dashicons-editor-help"></span>
-                        </span>
-
-                    </th>
-                    <td><input type="text" name="notion_content_api_key" value="<?php echo $api_key; ?>" class="widefat" /></td>
-                </tr>
-                
-                <tr valign="top">
-                    <th scope="row">Notion Database URL
-                    <span class="help-tip" title="The full URL of the Notion database (not just the ID)">
-                        <span class="dashicons dashicons-editor-help"></span>
+        <h1>Notion Content Setup</h1>
+        <form method="post" action="">
+        <input type="hidden" name="notion_content_check_config" value="1">
+        <table class="form-table">
+            <tr valign="top">
+                <th scope="row">
+                    Notion API Key
+                    <span class="help-tip" title="Internal Integration Secret found in Notion in the Notion Developers site">
+                            <span class="dashicons dashicons-editor-help"></span>
                     </span>
-                    </th>
-                    <td><input type="text" name="notion_content_database_url" value="<?php echo $database_url; ?>" class="widefat" /></td>
-                </tr>
-            </table>
-            <?php submit_button(); ?>
-            </form>
-
+                </th>
+                <td><input type="text" name="notion_content_api_key" value="<?php echo $api_key; ?>" class="widefat" /></td>
+            </tr>
+            
+            <tr valign="top">
+                <th scope="row">Notion Database URL
+                <span class="help-tip" title="The full URL of the Notion database (not just the ID)">
+                    <span class="dashicons dashicons-editor-help"></span>
+                </span>
+                </th>
+                <td><input type="text" name="notion_content_database_url" value="<?php echo $database_url; ?>" class="widefat" /></td>
+            </tr>
+        </table>
+        <?php submit_button(); ?>
+        </form>
     </div>
 
 
