@@ -45,7 +45,7 @@ function notion_content_check_notion_config($api_key, $pageID) {
         foreach ($body['results'] as $result) {
             if($result["type"] == "child_database") {
                 $arrDB = array();
-                $arrDB["id"] = $result["id"];
+                $arrDB["id"] = str_replace("-", "", $result["id"]);
                 $arrDB["name"] = $result["child_database"]["title"];
                 $results["databases"][] = $arrDB;
             }
@@ -63,7 +63,6 @@ function notion_content_check_notion_config($api_key, $pageID) {
         ]);
         if($response["response"]["code"] == "200") {
             $results["url_type"] = "Database";
-            echo "Database!!";
         }
         else {
             // The ID is either not a database, an invalid ID, or has not been integrated with the API key
@@ -78,18 +77,18 @@ function notion_content_check_notion_config($api_key, $pageID) {
 
 
 function notion_content_setup_page() {
-
+    $page = "";
     if(isset($_POST["notion_content_check_config"]) && $_POST["notion_content_check_config"]) {
         $api_key = $_POST["notion_content_api_key"];
         $pageID = notion_extract_database_id($_POST["notion_content_database_url"]);
         $results = notion_content_check_notion_config($api_key, $pageID);
-
         switch($results["url_type"]) {
             case "Page":
                 // Check to see if there are child databases and then list them.  If there are not, then give an error message.  
                 if(count($results["databases"]) > 0) {
                     // Show list of databases
-                    $msg = "Show list of databases";
+                    $page = "database";
+
                 }
                 else {
                     $msg = "No databases found on the given URL";
@@ -97,16 +96,24 @@ function notion_content_setup_page() {
                 break;
             case "Database":
                 // Success!  Save API Key and Database URL into database
-                break;
+                $page = "success";
+                update_option('notion_content_api_key', sanitize_text_field($_POST['notion_content_api_key']));
+                update_option('notion_content_database_url', sanitize_text_field($_POST['notion_content_database_url']));
 
+
+
+                break;
             case "Not Found":
                 $msg = "There was an error finding the database.  Please check the API Key and the URL.  Make sure that the Notion Database has been integrated with the API key.";
                 break;
         }
-
     }
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
+
     ?>
+
+
+
     <?php if(isset($msg) && $msg) : ?>
     <div class="notice notice-error is-dismissible">
         <p><?php _e($msg, 'notion-content'); ?></p>
@@ -114,22 +121,46 @@ function notion_content_setup_page() {
     <?php endif; ?>
 
 
-    <?php
+   
+
+    <div class="wrap" id="notion-content-plugin-admin">
+        <h1>Notion Content Setup</h1>
+        <?php 
+        switch($page) {
+
+            case "success":
+                notion_content_setup_page_success(); 
+                break;
+
+            case "database":
+                notion_content_setup_page_choose_database($results["databases"]); 
+                break;
+
+            default:
+                notion_content_setup_page_form(); 
+                break;
+        }
+        ?>
+
+
+
+    </div>
+
+
+<?php
+}
+
+
+function notion_content_setup_page_form() {
     $api_key = "";
     if(isset($_POST["notion_content_api_key"])) {
         $api_key = $_POST["notion_content_api_key"];
     }
-
     $database_url = "";
     if(isset($_POST["notion_content_database_url"])) {
         $database_url = $_POST["notion_content_database_url"];
     }
-
-
     ?>
-
-    <div class="wrap" id="notion-content-plugin-admin">
-        <h1>Notion Content Setup</h1>
         <form method="post" action="">
         <input type="hidden" name="notion_content_check_config" value="1">
         <table class="form-table">
@@ -142,7 +173,6 @@ function notion_content_setup_page() {
                 </th>
                 <td><input type="text" name="notion_content_api_key" value="<?php echo $api_key; ?>" class="widefat" /></td>
             </tr>
-            
             <tr valign="top">
                 <th scope="row">Notion Database URL
                 <span class="help-tip" title="The full URL of the Notion database (not just the ID)">
@@ -154,7 +184,71 @@ function notion_content_setup_page() {
         </table>
         <?php submit_button(); ?>
         </form>
+<?php
+}
+
+
+function notion_content_setup_page_choose_database($databases = array()) {
+    $api_key = "";
+    if(isset($_POST["notion_content_api_key"])) {
+        $api_key = $_POST["notion_content_api_key"];
+    }
+    $database_url = "";
+    if(isset($_POST["notion_content_database_url"])) {
+        $database_url = $_POST["notion_content_database_url"];
+    }
+    ?>
+        <form method="post" action="">
+        <input type="hidden" name="notion_content_check_config" value="1">
+        <input type="hidden" name="notion_content_api_key" value="<?php echo $api_key; ?>">
+        <table class="form-table">
+            <tr valign="top">
+                <th scope="row">Notion Database URL
+                </th>
+                <td>
+                <select name="notion_content_database_url">
+                <?php foreach($databases AS $database) : ?>
+                    <option value="https:www.notion.so/<?php echo $database["id"]; ?>"><?php echo $database["name"]; ?></option>
+                <?php endforeach; ?>
+                </select>
+                </td>
+            </tr>
+        </table>
+        <?php submit_button(); ?>
+        </form>
+<?php
+}
+
+
+function notion_content_setup_page_success() {
+    ?>
+
+
+<div class="wrap">
+    <h1>🎉 Congratulations!</h1>
+    <div class="postbox">
+        <div class="inside">
+            <p>Your setup is complete! Your plugin is ready to use.</p>
+        </div>
     </div>
+
+    <div class="postbox">
+        <div class="inside">
+            <h2>Next Steps:</h2>
+            <ul>
+                <li><strong>Refresh Content:</strong> Before you can use your Notion content, you need to import the content into Wordpress first.</li>
+                <li><strong>Shortcodes:</strong> After importing your content, use the shortcode of the Notion page to display the content in Wordpress.  </li>
+                <li><strong>Customize Sytles:</strong> Customize your styles in the <a href="<?php echo admin_url('admin.php?page=notion-content-styles'); ?>">Styles</a> page. 
+                <li><strong>Documentation:</strong> Visit our <a href="#">documentation</a> for detailed guides and tips.</li>
+            </ul>
+        </div>
+    </div>
+
+    <p>
+        <a href="<?php echo admin_url('admin.php?page=notion-content'); ?>" class="button button-primary">Go to the Notion Content Page</a>
+    </p>
+</div>
+
 
 
 <?php
