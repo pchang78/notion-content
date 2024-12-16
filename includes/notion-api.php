@@ -82,6 +82,7 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
                     break;
 
                 default: 
+
                     if($bulleted_list_item) {
                         $bulleted_list_item = false;
                         $content .= "</ul>";
@@ -90,11 +91,24 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
                         $numbered_list_item = false;
                         $content .= "</ol>";
                     }
+
                     break;
             }
-
             $content .= notion_render_block($block, $api_key, $extra);
         }
+
+
+        if($bulleted_list_item) {
+            $bulleted_list_item = false;
+            $content .= "</ul>";
+        }
+        if($numbered_list_item) {
+            $numbered_list_item = false;
+            $content .= "</ol>";
+        }
+
+
+
         return $content;
     }
 
@@ -156,11 +170,20 @@ function notion_render_block($block, $api_key, $extra = "") {
             $text = notion_get_text($block['bulleted_list_item']['rich_text']);
             $li_style = get_option('notion_content_style_li', '');
             if(isset($li_style) && $li_style) {
-                $html = "<li class='$li_style'>$text</li>";
+                $html = "<li class='$li_style'>$text";
             }
             else {
-                $html = "<li>$text</li>";
+                $html = "<li>$text";
             }
+
+            if(isset($block["has_children"]) && $block["has_children"]) {
+                $html .= notion_get_page_content($api_key, $blockID);
+            }
+
+            $html .= "</li>";
+
+
+
             if($extra == "open") {
                 $ul_style = get_option('notion_content_style_ul', '');
                 if(isset($ul_style) && $ul_style) {
