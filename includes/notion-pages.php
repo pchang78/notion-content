@@ -1,7 +1,6 @@
 <?php
 
-
-
+// Display pages
 function notion_content_display_pages() {
 
     // API and URL not setup yet
@@ -107,9 +106,6 @@ function notion_content_display_pages() {
 	    </div>
 
     </div>
-
-
-
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

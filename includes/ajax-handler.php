@@ -1,9 +1,12 @@
 <?php
+// This file is used to handle AJAX requests for the Notion Content plugin.
+
 // Ensure direct access to this file is restricted
 if (!defined('ABSPATH')) {
     exit;
 }
 
+// This function is used to add custom cron schedules to the Wordpress cron system.
 function notion_custom_cron_schedules($schedules) {
     $schedules['15_minutes'] = array(
         'interval' => 900, // 15 minutes in seconds
@@ -38,6 +41,8 @@ function notion_cron_update_func($page_id = 0)  {
 }
 add_action('notion_cron_update', 'notion_cron_update_func');
 
+// This function is used to set the cron interval for a page.
+// It is called via AJAX when the user changes the cron interval for a page.
 function notion_set_cron_interval() {
     check_ajax_referer('notion_cron_nonce', 'nonce');
     $page_id = sanitize_text_field($_POST['page_id']);

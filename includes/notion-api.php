@@ -53,11 +53,6 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
     }
 
     $body = json_decode(wp_remote_retrieve_body($response), true);
-    if($debug) {
-        echo "<pre>";
-        print_r($body);
-        echo "</pre>";
-    }
     $bulleted_list_item = false;
     $numbered_list_item = false;
     
@@ -91,12 +86,10 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
                         $numbered_list_item = false;
                         $content .= "</ol>";
                     }
-
                     break;
             }
             $content .= notion_render_block($block, $api_key, $extra);
         }
-
 
         if($bulleted_list_item) {
             $bulleted_list_item = false;
@@ -122,6 +115,7 @@ function notion_render_block($block, $api_key, $extra = "") {
     
     switch ($block['type']) {
 
+        // Paragraph block
         case 'paragraph':
             $text = notion_get_text($block['paragraph']['rich_text']);
             $paragraph_style = get_option('notion_content_style_paragraph', '');
@@ -132,7 +126,8 @@ function notion_render_block($block, $api_key, $extra = "") {
                 $html = "<p>$text</p>";
             }
             break;
-        
+
+        // Heading 1 block
         case 'heading_1':
             $text = notion_get_text($block['heading_1']['rich_text']);
             $heading1_style = get_option('notion_content_style_heading1', '');
@@ -144,6 +139,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Heading 2 block
         case 'heading_2':
             $text = notion_get_text($block['heading_2']['rich_text']);
             $heading2_style = get_option('notion_content_style_heading2', '');
@@ -155,6 +151,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Heading 3 block
         case 'heading_3':
             $text = notion_get_text($block['heading_3']['rich_text']);
             $heading3_style = get_option('notion_content_style_heading3', '');
@@ -166,6 +163,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Bulleted list item block
         case 'bulleted_list_item':
             $text = notion_get_text($block['bulleted_list_item']['rich_text']);
             $li_style = get_option('notion_content_style_li', '');
@@ -176,13 +174,11 @@ function notion_render_block($block, $api_key, $extra = "") {
                 $html = "<li>$text";
             }
 
+            // Check for nested blocks
             if(isset($block["has_children"]) && $block["has_children"]) {
                 $html .= notion_get_page_content($api_key, $blockID);
             }
-
             $html .= "</li>";
-
-
 
             if($extra == "open") {
                 $ul_style = get_option('notion_content_style_ul', '');
@@ -195,6 +191,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Numbered list item block
         case 'numbered_list_item':
             $text = notion_get_text($block['numbered_list_item']['rich_text']);
             $html = "<li>$text</li>";
@@ -203,12 +200,14 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // To do block
         case 'to_do':
             $text = notion_get_text($block['to_do']['rich_text']);
             $checked = $block['to_do']['checked'] ? 'checked' : '';
             $html = "<p><input type='checkbox' $checked disabled> $text</p>";
             break;
 
+        // Toggle block
         case 'toggle':
             $toggle_content = "";
             $toggle_content = notion_get_page_content($api_key, $blockID);
@@ -216,6 +215,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             $html = "<details><summary>$text</summary>$toggle_content</details>";
             break;
 
+        // Quote block
         case 'quote':
             $text = notion_get_text($block['quote']['rich_text']);
             $quote_style = get_option('notion_content_style_quote', '');
@@ -227,6 +227,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Divider block
         case 'divider':
             $hr_style = get_option('notion_content_style_hr', '');
             if(isset($hr_style) && $hr_style) {
@@ -237,6 +238,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Table block
         case 'table':
             $table_style = get_option('notion_content_style_table', '');
             if(isset($table_style) && $table_style) {
@@ -250,6 +252,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             $html .= "</table>";
             break;
 
+        // Table row block
         case 'table_row':
             $row_style = get_option('notion_content_style_row', '');
             if(isset($row_style) && $row_style) {
@@ -262,6 +265,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             $html .= "</tr>";
             break;
 
+        // Image block
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
             $image_size = get_option('notion_content_image_size');
@@ -281,6 +285,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Column list block
         case "column_list":
             $column_tag = get_option('notion_content_column_tag');
             if($column_tag == 'div') {
@@ -319,6 +324,7 @@ function notion_render_block($block, $api_key, $extra = "") {
             }
             break;
 
+        // Column block
         case "column":
             $column_tag = get_option('notion_content_column_tag');
             if($column_tag == 'div') {
@@ -374,6 +380,7 @@ function notion_get_table_cells($table_cells) {
     return $text;
 }
 
+// Get text from a rich text array
 function notion_get_text($rich_text_array, $add_breaks = false) {
     $text = '';
     foreach ($rich_text_array as $rich_text) {
@@ -407,6 +414,7 @@ function notion_get_text($rich_text_array, $add_breaks = false) {
     return $text;
 }
 
+// Refresh all pages from Notion
 function notion_content_refresh() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'notion_content';
@@ -435,8 +443,6 @@ function notion_content_refresh() {
 
         // Check if page exists in database
         $existing_page = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE page_id = %s", $page_id), ARRAY_A);
-
-
         if ($existing_page) {
             if(!$existing_page['webhook_id']) {
                 $webhook_id = bin2hex(random_bytes(16)); // Generates a 32-character unique alphanumeric string
@@ -454,6 +460,7 @@ function notion_content_refresh() {
     }
 }
 
+// Refresh a single page from Notion
 function notion_content_refresh_single_page($page_id) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'notion_content';
@@ -536,6 +543,7 @@ function notion_get_page_title($api_key, $page_id) {
     return 'Untitled Page'; // Default if no title is found
 }
 
+// Handle image
 function notion_handle_image($object_id, $image_url) {
     global $wpdb;
 

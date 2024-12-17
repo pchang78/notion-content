@@ -1,8 +1,9 @@
 === Notion Content ===
-Contributors: yourusername
-Tags: Notion, content management, Notion API, custom fields, CSS, WordPress plugin
+Contributors: patchang
+Donate link: https://everydaytech.tv/wp/notion-content
+Tags: notion, api, automation, synchronization
 Requires at least: 5.5
-Tested up to: 6.3
+Tested up to: 6.7.1
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -47,10 +48,10 @@ Yes, it stores content locally in a custom database table to minimize Notion API
 
 == Screenshots ==
 
-1. **Settings Page**: Enter API Key and Database URL to connect to Notion.
-2. **Notion Pages List**: View synced pages and copy shortcodes.
-3. **Styles Tab - Classes**: Customize CSS classes for Notion content elements.
-4. **Styles Tab - Custom CSS**: Add global CSS for all Notion content.
+1. Settings Page - Enter API Key and Database URL to connect to Notion.
+2. Notion Pages Listing - View synced pages and copy shortcodes.
+3. Classes - Customize CSS classes for Notion content elements.
+4. Custom CSS - Add global CSS for all Notion content.
 
 == Changelog ==
 

@@ -1,5 +1,8 @@
 <?php
+/* This file is used to handle the setup of the Notion Content plugin.  If the plugin does not have a valid API key and database URL, it will display a setup page.
+*/
 
+// Check if the plugin is setup
 function notion_content_is_setup() {
     $notion_content_api_key = esc_attr(get_option('notion_content_api_key'));
     $notion_content_database_url = esc_attr(get_option('notion_content_database_url'));
@@ -68,14 +71,12 @@ function notion_content_check_notion_config($api_key, $pageID) {
             // The ID is either not a database, an invalid ID, or has not been integrated with the API key
             $results["url_type"] = "Not Found";
         }
-
     }
 
     return $results;
 }
 
-
-
+// Display the setup page
 function notion_content_setup_page() {
     $page = "";
     if(isset($_POST["notion_content_check_config"]) && $_POST["notion_content_check_config"]) {
@@ -112,16 +113,11 @@ function notion_content_setup_page() {
 
     ?>
 
-
-
     <?php if(isset($msg) && $msg) : ?>
     <div class="notice notice-error is-dismissible">
         <p><?php _e($msg, 'notion-content'); ?></p>
     </div>
     <?php endif; ?>
-
-
-   
 
     <div class="wrap" id="notion-content-plugin-admin">
         <h1>Notion Content Setup</h1>
@@ -141,16 +137,11 @@ function notion_content_setup_page() {
                 break;
         }
         ?>
-
-
-
     </div>
-
-
 <?php
 }
 
-
+// Display the setup page form
 function notion_content_setup_page_form() {
     $api_key = "";
     if(isset($_POST["notion_content_api_key"])) {
@@ -187,7 +178,7 @@ function notion_content_setup_page_form() {
 <?php
 }
 
-
+// Display the setup page choose database
 function notion_content_setup_page_choose_database($databases = array()) {
     $api_key = "";
     if(isset($_POST["notion_content_api_key"])) {
@@ -220,10 +211,9 @@ function notion_content_setup_page_choose_database($databases = array()) {
 }
 
 
+// Display the setup page success
 function notion_content_setup_page_success() {
     ?>
-
-
 <div class="wrap">
     <h1>🎉 Congratulations!</h1>
     <div class="postbox">
@@ -231,7 +221,6 @@ function notion_content_setup_page_success() {
             <p>Your setup is complete! Your plugin is ready to use.</p>
         </div>
     </div>
-
     <div class="postbox">
         <div class="inside">
             <h2>Next Steps:</h2>
@@ -243,13 +232,10 @@ function notion_content_setup_page_success() {
             </ul>
         </div>
     </div>
-
     <p>
         <a href="<?php echo admin_url('admin.php?page=notion-content'); ?>" class="button button-primary">Go to the Notion Content Page</a>
     </p>
 </div>
-
-
 
 <?php
 }

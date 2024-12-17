@@ -1,4 +1,5 @@
 <?php
+/* This file is used to handle the settings of the Notion Content plugin. */
 
 // Register settings and display settings page
 add_action('admin_init', 'notion_content_register_settings');
@@ -10,19 +11,17 @@ function notion_content_register_settings() {
     register_setting('notion_content_settings_group', 'notion_content_column_tag');
 }
 
+// Get all image sizes, including custom sizes
 function get_all_image_sizes() {
 
     $all_sizes = wp_get_registered_image_subsizes();
     $excluded_sizes = ['1536x1536', '2048x2048']; // Add sizes to exclude here
-
     $filtered_sizes = [];
     foreach ($all_sizes as $size_name => $attributes) {
         if (!in_array($size_name, $excluded_sizes, true)) {
-
             if($attributes['height'] == 0) {
                 $attributes['height'] = $attributes['width'];
             }
-
             $label = ucwords(str_replace("_", " ", $size_name));
             $filtered_sizes[$size_name] = sprintf(
                 '%s (%dx%d)',
@@ -37,20 +36,17 @@ function get_all_image_sizes() {
 
 }
 
+// Display the settings page
 function notion_content_display_settings() {
-
     // API and URL not setup yet
     if(!notion_content_is_setup()) {
         notion_content_setup_page();
         return;
     }
-
     if (isset($_GET['settings-updated'])) {
         add_settings_error('notion_content_messages', 'notion_content_message', 'Settings have been saved. <p>In order for your settings to take into effect, you must refresh your content.</p>', 'updated');
     }
-
     settings_errors('notion_content_messages');
-
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
 
@@ -70,13 +66,9 @@ function notion_content_display_settings() {
         <?php do_settings_sections('notion_content_settings_group'); ?>
 
         <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'general') : ?>
-
-
             <input type="hidden" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" />
             <input type="hidden" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" />
-
             <table class="form-table">
-
                 <tr valign="top">
                     <th scope="row">Image Size
                         <span class="help-tip" title="Determine which image size to be displayed on your wordpress page.">
@@ -117,7 +109,6 @@ function notion_content_display_settings() {
                     </select>
                     </td>
                 </tr>
-
             </table>
 
         <?php elseif ($_GET['tab'] === 'setup') : ?>
@@ -131,7 +122,6 @@ function notion_content_display_settings() {
                         <span class="help-tip" title="Internal Integration Secret found in Notion in the Notion Developers site">
                              <span class="dashicons dashicons-editor-help"></span>
                         </span>
-
                     </th>
                     <td><input type="text" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" class="widefat" /></td>
                 </tr>
@@ -145,11 +135,7 @@ function notion_content_display_settings() {
                     <td><input type="text" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" class="widefat" /></td>
                 </tr>
             </table>
-            
-
-
         <?php endif; ?>
-
             <?php submit_button(); ?>
         </form>
     </div>

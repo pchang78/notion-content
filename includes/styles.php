@@ -1,18 +1,17 @@
 <?php
+/* This file is used to handle the styles of the Notion Content plugin. */
 
+// Display the styles page
 function notion_content_styles_page() {
     if (!current_user_can('manage_options')) {
         wp_die(__('You do not have sufficient permissions to access this page.'));
     }
 
-
-      // API and URL not setup yet
-      if(!notion_content_is_setup()) {
+    // API and URL not setup yet
+    if(!notion_content_is_setup()) {
         notion_content_setup_page();
         return;
     }
-
-
 
 
     // Save form data when submitted
@@ -75,8 +74,6 @@ function notion_content_styles_page() {
     $col_col_style = get_option('notion_content_style_column_col', '');
 
     $custom_css = get_option('notion_content_custom_css', '');
-
-
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
 
@@ -252,8 +249,6 @@ function notion_content_styles_page() {
                             <?php endif; ?>
                         </td>
                     </tr>
-
-
 
                 </table>
 

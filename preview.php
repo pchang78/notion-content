@@ -1,4 +1,6 @@
 <?php
+// This file is used to preview the content of a Notion page on your Wordpress site.
+
 // Load WordPress environment
 require_once dirname(__FILE__) . '/../../../wp-load.php';
 
