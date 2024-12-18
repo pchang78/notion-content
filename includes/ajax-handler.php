@@ -45,8 +45,12 @@ add_action('notion_cron_update', 'notion_cron_update_func');
 // It is called via AJAX when the user changes the cron interval for a page.
 function notion_set_cron_interval() {
     check_ajax_referer('notion_cron_nonce', 'nonce');
-    $page_id = sanitize_text_field($_POST['page_id']);
-    $interval = sanitize_text_field($_POST['interval']);
+    if(isset($_POST['page_id'])) {
+        $page_id = sanitize_text_field(wp_unslash($_POST['page_id']));
+    }
+    if(isset($_POST['interval'])) {
+        $interval = sanitize_text_field(wp_unslash($_POST['interval']));
+    }
 
     global $wpdb;
     $table_name = $wpdb->prefix . 'notion_content';

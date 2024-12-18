@@ -10,16 +10,18 @@ function notion_content_display_pages() {
     }
 
     // Refresh all content action
-    if (isset($_POST['refresh_content'])) {
+    if (isset($_POST['refresh_content']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
         notion_content_refresh(); // Refresh all pages
         notion_content_admin_msg("All Content Updated");
     }
 
     // Refresh individual page action
-    if (isset($_POST['refresh_single_page']) && isset($_POST['page_id'])) {
-        $page_id = sanitize_text_field($_POST['page_id']); // Ensure page_id is a string
-        notion_content_refresh_single_page($page_id); // Refresh specific page
-        notion_content_admin_msg("Content " . $page_id . " updated");
+    if (isset($_POST['refresh_single_page']) && isset($_POST['page_id']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
+        if(isset($_POST['page_id'])) {
+            $page_id = sanitize_text_field(wp_unslash($_POST['page_id'])); // Ensure page_id is a string
+            notion_content_refresh_single_page($page_id); // Refresh specific page
+            notion_content_admin_msg("Content " . $page_id . " updated");
+        }
     }
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
@@ -29,14 +31,14 @@ function notion_content_display_pages() {
         
         <form method="post">
             <input type="submit" name="refresh_content" class="button button-primary" value="Refresh All Content">
+            <?php wp_nonce_field( 'notion_content_pages_form', 'notion_content_pages_form_nonce' ); ?>
         </form>
         <br>
         
         <?php
         global $wpdb;
         $table_name = $wpdb->prefix . 'notion_content';
-        
-        $pages = $wpdb->get_results("SELECT * FROM $table_name WHERE is_active = 1", ARRAY_A);
+        $pages = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE is_active = %d", 1), ARRAY_A);
 
         if ($pages) {
             echo '<table class="wp-list-table widefat widetable striped">';
@@ -69,6 +71,7 @@ function notion_content_display_pages() {
                 echo '<td>' . esc_html($last_updated) . '</td>';
                 echo '<td>';
                 echo '<form method="post" style="display:inline;">';
+                echo '<input type="hidden" name="notion_content_pages_form_nonce" value="' . esc_attr(wp_create_nonce('notion_content_pages_form')) . '">';
                 echo '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '">';
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
                 $preview_url = add_query_arg(array('id' => urlencode($page_id), '_wpnonce' => wp_create_nonce( 'notion_content_preview_nonce' )), plugin_dir_url(__FILE__) . '../preview.php');

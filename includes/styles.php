@@ -13,29 +13,39 @@ function notion_content_styles_page() {
         return;
     }
 
+    $arrFields = array(
+        'notion_content_style_paragraph' => 'paragraph_style',
+        'notion_content_style_heading1' => 'heading1_style',
+        'notion_content_style_heading2' => 'heading2_style',
+        'notion_content_style_heading3' => 'heading3_style',
+        'notion_content_style_table' => 'table_style',
+        'notion_content_style_row' => 'row_style',
+        'notion_content_style_col' => 'col_style',
+        'notion_content_style_ul' => 'ul_style',
+        'notion_content_style_li' => 'li_style',
+        'notion_content_style_quote' => 'quote_style',
+        'notion_content_style_hr' => 'hr_style',
+        'notion_content_style_img' => 'img_style',
+        'notion_content_style_column_div_wrapper' => 'col_div_wrapper_style',
+        'notion_content_style_column_div' => 'col_div_style',
+        'notion_content_style_column_table' => 'col_table_style',
+        'notion_content_style_column_row' => 'col_row_style',
+        'notion_content_style_column_col' => 'col_col_style',
+    );
+
 
     // Save form data when submitted
     if (isset($_POST['notion_content_styles_save'])) {
 
         // Save Classes styles
-        if(isset($_POST['paragraph_style'])) {
-            update_option('notion_content_style_paragraph', sanitize_text_field($_POST['paragraph_style']));
-            update_option('notion_content_style_heading1', sanitize_text_field($_POST['heading1_style']));
-            update_option('notion_content_style_heading2', sanitize_text_field($_POST['heading2_style']));
-            update_option('notion_content_style_heading3', sanitize_text_field($_POST['heading3_style']));
-            update_option('notion_content_style_table', sanitize_text_field($_POST['table_style']));
-            update_option('notion_content_style_row', sanitize_text_field($_POST['row_style']));
-            update_option('notion_content_style_col', sanitize_text_field($_POST['col_style']));
-            update_option('notion_content_style_ul', sanitize_text_field($_POST['ul_style']));
-            update_option('notion_content_style_li', sanitize_text_field($_POST['li_style']));
-            update_option('notion_content_style_quote', sanitize_text_field($_POST['quote_style']));
-            update_option('notion_content_style_hr', sanitize_text_field($_POST['hr_style']));
-            update_option('notion_content_style_img', sanitize_text_field($_POST['img_style']));
-            update_option('notion_content_style_column_div_wrapper', sanitize_text_field($_POST['col_div_wrapper_style']));
-            update_option('notion_content_style_column_div', sanitize_text_field($_POST['col_div_style']));
-            update_option('notion_content_style_column_table', sanitize_text_field($_POST['col_table_style']));
-            update_option('notion_content_style_column_row', sanitize_text_field($_POST['col_row_style']));
-            update_option('notion_content_style_column_col', sanitize_text_field($_POST['col_col_style']));
+        if(isset($_POST['paragraph_style']) && isset($_POST['notion_content_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_styles_page_nonce"])), 'notion_content_styles_page' )) {
+
+            foreach($arrFields as $option_name => $field_name) {
+                if(isset($_POST[$field_name])) {
+                    update_option($option_name, sanitize_text_field(wp_unslash($_POST[$field_name])));
+                }
+            }
+
 
             echo '<div class="updated">
                 <p>Styles updated successfully!</p>
@@ -44,8 +54,8 @@ function notion_content_styles_page() {
         }
         
         // Save Custom CSS
-        if(isset($_POST['custom_css'])) {
-            update_option('notion_content_custom_css', wp_strip_all_tags($_POST['custom_css']));
+        if(isset($_POST['custom_css']) && isset($_POST['notion_content_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_styles_page_nonce"])), 'notion_content_styles_page' )) {
+            update_option('notion_content_custom_css', wp_strip_all_tags(sanitize_text_field(wp_unslash($_POST['custom_css']))));
             echo '<div class="updated">
                 <p>Custom CSS updated successfully!</p>
                 <p>You must refresh your content for the custom CSS to be applied.</p>
@@ -54,25 +64,13 @@ function notion_content_styles_page() {
 
     }
 
-    // Retrieve saved options
-    $paragraph_style = get_option('notion_content_style_paragraph', '');
-    $heading1_style = get_option('notion_content_style_heading1', '');
-    $heading2_style = get_option('notion_content_style_heading2', '');
-    $heading3_style = get_option('notion_content_style_heading3', '');
-    $table_style = get_option('notion_content_style_table', '');
-    $row_style = get_option('notion_content_style_row', '');
-    $col_style = get_option('notion_content_style_col', '');
-    $ul_style = get_option('notion_content_style_ul', '');
-    $li_style = get_option('notion_content_style_li', '');
-    $quote_style = get_option('notion_content_style_quote', '');
-    $hr_style = get_option('notion_content_style_hr', '');
-    $img_style = get_option('notion_content_style_img', '');
-    $col_div_wrapper_style = get_option('notion_content_style_column_div_wrapper', '');
-    $col_div_style = get_option('notion_content_style_column_div', '');
-    $col_table_style = get_option('notion_content_style_column_table', '');
-    $col_row_style = get_option('notion_content_style_column_row', '');
-    $col_col_style = get_option('notion_content_style_column_col', '');
+    reset($arrFields);
+    // Get all the options values
+    foreach($arrFields as $option_name => $field_name) {
+        $$field_name = get_option($option_name, '');
+    }
 
+    // Get the custom CSS
     $custom_css = get_option('notion_content_custom_css', '');
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
@@ -90,6 +88,8 @@ function notion_content_styles_page() {
 
         <!-- Tab Content -->
         <form method="post">
+        <?php wp_nonce_field( 'notion_content_styles_page', 'notion_content_styles_page_nonce' ); ?>
+
             <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'classes') : ?>
                 <!-- Classes Tab -->
                 <h3>Define CSS Classes for Elements</h3>
