@@ -61,18 +61,18 @@ function notion_content_display_pages() {
                 $shortcode = '[notion_page page_id="' . $page_id . '"]';
                 
                 echo '<tr>';
-                echo '<td>' . $title . '</td>';
+                echo '<td>' . esc_html($title) . '</td>';
                 echo '<td>';
                 echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 350px;"/> ';
                 echo '<button class="button copy-button" data-shortcode="' . esc_attr($shortcode) . '">Copy</button>';
                 echo '</td>';
-                echo '<td>' . $last_updated . '</td>';
+                echo '<td>' . esc_html($last_updated) . '</td>';
                 echo '<td>';
                 echo '<form method="post" style="display:inline;">';
-                echo '<input type="hidden" name="page_id" value="' . $page_id . '">';
+                echo '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '">';
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
-                $preview_url = plugin_dir_url(__FILE__) . '../preview.php?id=' . urlencode($page_id);
-                echo '<a href="' . $preview_url . '" class="button" target="_blank" style="margin-left: 4px;">Preview</a>';
+                $preview_url = add_query_arg(array('id' => urlencode($page_id), '_wpnonce' => wp_create_nonce( 'notion_content_preview_nonce' )), plugin_dir_url(__FILE__) . '../preview.php');
+                echo '<a href="' . esc_url($preview_url) . '" class="button" target="_blank" style="margin-left: 4px;">Preview</a>';
                 echo '</form>';
                 echo '</td>';
 

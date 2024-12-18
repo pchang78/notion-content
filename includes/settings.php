@@ -86,7 +86,7 @@ function notion_content_display_settings() {
                         }
                     ?>
                     <?php foreach ($image_sizes as $name => $label) : ?>
-                        <option value='<?php echo $name; ?>' <?php selected($selected_option, $name); ?>><?php echo $label; ?></option>
+                        <option value='<?php echo esc_attr($name); ?>' <?php selected($selected_option, $name); ?>><?php echo esc_html($label); ?></option>
                     <?php endforeach; ?>
                     </select>
                     </td>

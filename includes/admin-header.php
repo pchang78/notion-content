@@ -3,7 +3,7 @@
 ?>
 <div class="notion-content-header">
     <div class="notion-content-header-inner">
-        <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/notion-content-logo.png'; ?>" alt="Notion Content Logo" class="notion-content-logo">
+        <img src="<?php echo esc_html(plugin_dir_url(__FILE__) . '../assets/notion-content-logo.png'); ?>" alt="Notion Content Logo" class="notion-content-logo">
         <h1 class="notion-content-title">Notion Content</h1>
         <nav class="notion-content-nav">
 <?php

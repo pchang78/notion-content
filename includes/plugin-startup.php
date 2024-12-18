@@ -115,7 +115,7 @@ function notion_content_setup_page() {
 
     <?php if(isset($msg) && $msg) : ?>
     <div class="notice notice-error is-dismissible">
-        <p><?php _e($msg, 'notion-content'); ?></p>
+        <p><?php print_f(__('%1', 'notion-content'), $msg); ?></p>
     </div>
     <?php endif; ?>
 
@@ -162,7 +162,7 @@ function notion_content_setup_page_form() {
                             <span class="dashicons dashicons-editor-help"></span>
                     </span>
                 </th>
-                <td><input type="text" name="notion_content_api_key" value="<?php echo $api_key; ?>" class="widefat" /></td>
+                <td><input type="text" name="notion_content_api_key" value="<?php echo esc_attr($api_key); ?>" class="widefat" /></td>
             </tr>
             <tr valign="top">
                 <th scope="row">Notion Database URL
@@ -170,7 +170,7 @@ function notion_content_setup_page_form() {
                     <span class="dashicons dashicons-editor-help"></span>
                 </span>
                 </th>
-                <td><input type="text" name="notion_content_database_url" value="<?php echo $database_url; ?>" class="widefat" /></td>
+                <td><input type="text" name="notion_content_database_url" value="<?php echo esc_attr($database_url); ?>" class="widefat" /></td>
             </tr>
         </table>
         <?php submit_button(); ?>
@@ -191,7 +191,7 @@ function notion_content_setup_page_choose_database($databases = array()) {
     ?>
         <form method="post" action="">
         <input type="hidden" name="notion_content_check_config" value="1">
-        <input type="hidden" name="notion_content_api_key" value="<?php echo $api_key; ?>">
+        <input type="hidden" name="notion_content_api_key" value="<?php echo esc_attr($api_key); ?>">
         <table class="form-table">
             <tr valign="top">
                 <th scope="row">Notion Database URL
@@ -199,7 +199,7 @@ function notion_content_setup_page_choose_database($databases = array()) {
                 <td>
                 <select name="notion_content_database_url">
                 <?php foreach($databases AS $database) : ?>
-                    <option value="https:www.notion.so/<?php echo $database["id"]; ?>"><?php echo $database["name"]; ?></option>
+                    <option value="https:www.notion.so/<?php echo esc_attr($database["id"]); ?>"><?php echo esc_html($database["name"]); ?></option>
                 <?php endforeach; ?>
                 </select>
                 </td>
@@ -227,13 +227,13 @@ function notion_content_setup_page_success() {
             <ul>
                 <li><strong>Refresh Content:</strong> Before you can use your Notion content, you need to import the content into Wordpress first.</li>
                 <li><strong>Shortcodes:</strong> After importing your content, use the shortcode of the Notion page to display the content in Wordpress.  </li>
-                <li><strong>Customize Sytles:</strong> Customize your styles in the <a href="<?php echo admin_url('admin.php?page=notion-content-styles'); ?>">Styles</a> page. 
+                <li><strong>Customize Sytles:</strong> Customize your styles in the <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content-styles')); ?>">Styles</a> page. 
                 <li><strong>Documentation:</strong> Visit our <a href="#">documentation</a> for detailed guides and tips.</li>
             </ul>
         </div>
     </div>
     <p>
-        <a href="<?php echo admin_url('admin.php?page=notion-content'); ?>" class="button button-primary">Go to the Notion Content Page</a>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content')); ?>" class="button button-primary">Go to the Notion Content Page</a>
     </p>
 </div>
 

@@ -546,6 +546,16 @@ function notion_get_page_title($api_key, $page_id) {
 // Handle image
 function notion_handle_image($object_id, $image_url) {
     global $wpdb;
+    global $wp_filesystem;
+
+    // Initialize WP_Filesystem
+    if ( ! function_exists( 'WP_Filesystem' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+    WP_Filesystem();
+
+
+
 
     $images_table = $wpdb->prefix . 'notion_images';
 
@@ -584,12 +594,12 @@ function notion_handle_image($object_id, $image_url) {
     // Move the downloaded file to the WordPress upload directory
     $uploads_dir = wp_upload_dir();
 
-    $parsed_url = parse_url($image_url);
+    $parsed_url = wp_parse_url($image_url);
     $filename = basename($parsed_url['path']); // Extract just the filename from the URL path
     $destination = $uploads_dir['path'] . '/' . $filename;
 
-    if (!rename($temp_file, $destination)) {
-        unlink($temp_file); // Clean up temp file if move fails
+    if (!$wp_filesystem->move($temp_file, $destination)) {
+        wp_delete_file($temp_file); // Clean up temp file if move fails
         return new WP_Error('file_move_failed', 'Failed to move the downloaded file to the upload directory.');
     }
 

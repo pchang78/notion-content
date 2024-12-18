@@ -110,7 +110,7 @@ function notion_content_admin_menu() {
 // Display success message
 function notion_content_admin_msg($message) {
 ?>
-    <div class="notice notice-success is-dismissible"> <p><?php echo $message; ?></p> </div>
+    <div class="notice notice-success is-dismissible"> <p><?php echo esc_html($message); ?></p> </div>
 <?php
 }
 
