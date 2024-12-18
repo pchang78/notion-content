@@ -79,9 +79,14 @@ function notion_content_check_notion_config($api_key, $pageID) {
 // Display the setup page
 function notion_content_setup_page() {
     $page = "";
-    if(isset($_POST["notion_content_check_config"]) && $_POST["notion_content_check_config"]) {
-        $api_key = $_POST["notion_content_api_key"];
-        $pageID = notion_extract_database_id($_POST["notion_content_database_url"]);
+    if(isset($_POST["notion_content_check_config"]) && sanitize_text_field(wp_unslash($_POST["notion_content_check_config"])) && isset($_POST["notion_content_setup_page_form_nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_setup_page_form_nonce"])), 'notion_content_setup_page_form' )) {
+        if(isset($_POST["notion_content_api_key"])) {
+            $api_key = sanitize_text_field(wp_unslash($_POST["notion_content_api_key"]));
+        }
+        if(isset($_POST["notion_content_database_url"])) {
+            $database_url = sanitize_text_field(wp_unslash($_POST["notion_content_database_url"]));
+        }
+        $pageID = notion_extract_database_id($database_url);
         $results = notion_content_check_notion_config($api_key, $pageID);
         switch($results["url_type"]) {
             case "Page":
@@ -98,8 +103,8 @@ function notion_content_setup_page() {
             case "Database":
                 // Success!  Save API Key and Database URL into database
                 $page = "success";
-                update_option('notion_content_api_key', sanitize_text_field($_POST['notion_content_api_key']));
-                update_option('notion_content_database_url', sanitize_text_field($_POST['notion_content_database_url']));
+                update_option('notion_content_api_key', sanitize_text_field(wp_unslash($_POST['notion_content_api_key'])));
+                update_option('notion_content_database_url', sanitize_text_field(wp_unslash($_POST['notion_content_database_url'])));
 
 
 
@@ -115,7 +120,7 @@ function notion_content_setup_page() {
 
     <?php if(isset($msg) && $msg) : ?>
     <div class="notice notice-error is-dismissible">
-        <p><?php print_f(__('%1', 'notion-content'), $msg); ?></p>
+        <p><?php echo esc_html($msg); ?></p>
     </div>
     <?php endif; ?>
 
@@ -144,16 +149,18 @@ function notion_content_setup_page() {
 // Display the setup page form
 function notion_content_setup_page_form() {
     $api_key = "";
-    if(isset($_POST["notion_content_api_key"])) {
-        $api_key = $_POST["notion_content_api_key"];
+    if(isset($_POST["notion_content_api_key"]) && isset($_POST["notion_content_setup_page_form_nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_setup_page_form_nonce"])), 'notion_content_setup_page_form' )) {
+        $api_key = sanitize_text_field(wp_unslash($_POST["notion_content_api_key"]));
     }
     $database_url = "";
-    if(isset($_POST["notion_content_database_url"])) {
-        $database_url = $_POST["notion_content_database_url"];
+    if(isset($_POST["notion_content_database_url"]) && isset($_POST["notion_content_setup_page_form_nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_setup_page_form_nonce"])), 'notion_content_setup_page_form' )) {
+        $database_url = sanitize_text_field(wp_unslash($_POST["notion_content_database_url"]));
     }
     ?>
         <form method="post" action="">
         <input type="hidden" name="notion_content_check_config" value="1">
+        <?php wp_nonce_field( 'notion_content_setup_page_form', 'notion_content_setup_page_form_nonce' ); ?>
+
         <table class="form-table">
             <tr valign="top">
                 <th scope="row">
@@ -181,17 +188,19 @@ function notion_content_setup_page_form() {
 // Display the setup page choose database
 function notion_content_setup_page_choose_database($databases = array()) {
     $api_key = "";
-    if(isset($_POST["notion_content_api_key"])) {
-        $api_key = $_POST["notion_content_api_key"];
+    if(isset($_POST["notion_content_api_key"]) && isset($_POST["notion_content_setup_page_form_nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_setup_page_form_nonce"])), 'notion_content_setup_page_form' )) {
+        $api_key = sanitize_text_field(wp_unslash($_POST["notion_content_api_key"]));
     }
     $database_url = "";
-    if(isset($_POST["notion_content_database_url"])) {
-        $database_url = $_POST["notion_content_database_url"];
+    if(isset($_POST["notion_content_database_url"]) && isset($_POST["notion_content_setup_page_form_nonce"]) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_setup_page_form_nonce"])), 'notion_content_setup_page_form' )) {
+        $database_url = sanitize_text_field(wp_unslash($_POST["notion_content_database_url"]));
     }
     ?>
         <form method="post" action="">
         <input type="hidden" name="notion_content_check_config" value="1">
         <input type="hidden" name="notion_content_api_key" value="<?php echo esc_attr($api_key); ?>">
+        <input type="hidden" name="notion_content_database_url" value="<?php echo esc_attr($database_url); ?>">
+        <?php wp_nonce_field( 'notion_content_setup_page_form', 'notion_content_setup_page_form_nonce' ); ?>
         <table class="form-table">
             <tr valign="top">
                 <th scope="row">Notion Database URL

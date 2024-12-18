@@ -10,7 +10,7 @@ function notion_page_shortcode($atts) {
     global $wpdb;
     $table_name = $wpdb->prefix . 'notion_content';
 
-    $page = $wpdb->get_row($wpdb->prepare("SELECT content FROM $table_name WHERE page_id = %s AND is_active = 1", $page_id), ARRAY_A);
+    $page = $wpdb->get_row($wpdb->prepare("SELECT content FROM $table_name WHERE page_id = %s AND is_active = %d", $page_id, 1), ARRAY_A);
 
     if ($page) {
         $custom_css = get_option('notion_content_custom_css', '');
