@@ -7,7 +7,21 @@
         <h1 class="notion-content-title">Notion Content</h1>
         <nav class="notion-content-nav">
 <?php
-$current_page = isset($_GET['page']) ? $_GET['page'] : '';
+
+$screen = get_current_screen();
+switch($screen->id) {
+    case 'toplevel_page_notion-content':
+        $current_page = 'notion-content';
+        break;
+    case 'notion-content_page_notion-content-styles':
+        $current_page = 'notion-content-styles';
+        break;
+    case 'notion-content_page_notion-content-settings':
+        $current_page = 'notion-content-settings';
+        break;
+}
+
+
 ?>
 <?php if(notion_content_is_setup()) : ?>
 
