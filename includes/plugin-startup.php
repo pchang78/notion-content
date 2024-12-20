@@ -248,3 +248,60 @@ function notion_content_setup_page_success() {
 
 <?php
 }
+
+// Register Custom Post Type
+function register_notion_content_post_type() {
+    $labels = array(
+        'name'                  => _x('Notion Content', 'Post Type General Name', 'notion-content'),
+        'singular_name'         => _x('Notion Content', 'Post Type Singular Name', 'notion-content'),
+        'menu_name'            => __('Notion Content', 'notion-content'),
+        'all_items'            => __('All Pages', 'notion-content'),
+        'add_new'              => __('Add New', 'notion-content'),
+        'add_new_item'         => __('Add New Page', 'notion-content'),
+        'edit_item'            => __('Edit Page', 'notion-content'),
+        'new_item'             => __('New Page', 'notion-content'),
+        'view_item'            => __('View Page', 'notion-content'),
+        'search_items'         => __('Search Pages', 'notion-content'),
+        'not_found'            => __('No pages found', 'notion-content'),
+        'not_found_in_trash'   => __('No pages found in Trash', 'notion-content'),
+    );
+    
+    $args = array(
+        'label'                 => __('Notion Content', 'notion-content'),
+        'labels'                => $labels,
+        'supports'              => array('title', 'editor'),
+        'hierarchical'          => false,
+        'public'               => true,
+        'show_ui'              => true,
+        'show_in_menu'         => true,
+        'menu_position'        => 20,
+        'menu_icon'            => 'dashicons-media-document',
+        'show_in_admin_bar'    => true,
+        'show_in_nav_menus'    => true,
+        'can_export'           => true,
+        'has_archive'          => true,
+        'exclude_from_search'  => false,
+        'publicly_queryable'   => true,
+        'capability_type'      => 'post',
+        'show_in_rest'         => true,
+    );
+    
+    register_post_type('notion_content', $args);
+}
+add_action('init', 'register_notion_content_post_type');
+
+// Register notion_images post type
+function register_notion_images_post_type() {
+    register_post_type('notion_images', array(
+        'labels' => array(
+            'name' => 'Notion Images',
+            'singular_name' => 'Notion Image'
+        ),
+        'public' => false,
+        'show_ui' => false,
+        'show_in_menu' => false,
+        'supports' => array('title'),
+        'can_export' => true
+    ));
+}
+add_action('init', 'register_notion_images_post_type');

@@ -27,48 +27,126 @@ require_once NOTION_CONTENT_PLUGIN_PATH . 'includes/ajax-handler.php';
 
 // Activate plugin and create custom table
 // Local table is used to store content from Notion to be displayed on your Wordpress post, page, or custom post type.
-register_activation_hook(__FILE__, 'notion_content_create_table');
-function notion_content_create_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_content';
-    $charset_collate = $wpdb->get_charset_collate();
-    $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        page_id VARCHAR(255) NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        content LONGTEXT NOT NULL,
-        images TEXT,
-        last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        cron_interval varchar(50) NOT NULL DEFAULT 'manual',
-        is_active TINYINT(1) DEFAULT 1,
-        webhook_id VARCHAR(255) UNIQUE,
-        PRIMARY KEY  (id),
-        INDEX idx_page_id (page_id),
-        INDEX idx_is_active (is_active),
-        INDEX idx_cron_interval (cron_interval)
-    ) $charset_collate;";
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
+register_activation_hook(__FILE__, 'notion_content_activation');
+function notion_content_activation() {
+    // Register both custom post types to ensure rewrite rules are flushed
+    notion_content_register_post_type();
+    notion_images_register_post_type();
+    
+    // Flush rewrite rules
+    flush_rewrite_rules();
 }
 
-// Local table is used to keep traick of images imported from Notion
-register_activation_hook(__FILE__, 'notion_create_images_table');
-function notion_create_images_table() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_images';
-    $charset_collate = $wpdb->get_charset_collate();
-    // SQL to create the table
-    $sql = "CREATE TABLE $table_name (
-        id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        object_id VARCHAR(255) NOT NULL,
-        post_id BIGINT(20) UNSIGNED NOT NULL,
-        PRIMARY KEY  (id),
-        UNIQUE KEY unique_object (object_id)
-    ) $charset_collate;";
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-    dbDelta($sql);
+// Register Custom Post Type
+function notion_content_register_post_type() {
+    register_post_type('notion_content', array(
+        'public' => false,
+        'publicly_queryable' => false,
+        'show_ui' => false,
+        'supports' => array('title', 'editor'),
+        'can_export' => true,
+        'delete_with_user' => false
+    ));
+}
+add_action('init', 'notion_content_register_post_type');
+
+// Add custom meta boxes for Notion-specific fields
+function notion_content_add_meta_boxes() {
+    add_meta_box(
+        'notion_content_meta',
+        __('Notion Details', 'notion-content'),
+        'notion_content_meta_box_callback',
+        'notion_content',
+        'normal',
+        'high'
+    );
+}
+add_action('add_meta_boxes', 'notion_content_add_meta_boxes');
+
+// Meta box callback function
+function notion_content_meta_box_callback($post) {
+    // Add nonce for security
+    wp_nonce_field('notion_content_meta_box', 'notion_content_meta_box_nonce');
+
+    // Get existing values
+    $page_id = get_post_meta($post->ID, '_notion_page_id', true);
+    $cron_interval = get_post_meta($post->ID, '_notion_cron_interval', true);
+    $is_active = get_post_meta($post->ID, '_notion_is_active', true);
+    $webhook_id = get_post_meta($post->ID, '_notion_webhook_id', true);
+
+    // Output the fields
+    ?>
+    <p>
+        <label for="notion_page_id"><?php _e('Notion Page ID:', 'notion-content'); ?></label>
+        <input type="text" id="notion_page_id" name="notion_page_id" value="<?php echo esc_attr($page_id); ?>" />
+    </p>
+    <p>
+        <label for="notion_cron_interval"><?php _e('Sync Interval:', 'notion-content'); ?></label>
+        <select id="notion_cron_interval" name="notion_cron_interval">
+            <option value="manual" <?php selected($cron_interval, 'manual'); ?>>Manual</option>
+            <option value="hourly" <?php selected($cron_interval, 'hourly'); ?>>Hourly</option>
+            <option value="daily" <?php selected($cron_interval, 'daily'); ?>>Daily</option>
+            <option value="weekly" <?php selected($cron_interval, 'weekly'); ?>>Weekly</option>
+        </select>
+    </p>
+    <p>
+        <label for="notion_is_active"><?php _e('Active:', 'notion-content'); ?></label>
+        <input type="checkbox" id="notion_is_active" name="notion_is_active" <?php checked($is_active, '1'); ?> />
+    </p>
+    <?php if ($webhook_id) : ?>
+        <input type="hidden" name="notion_webhook_id" value="<?php echo esc_attr($webhook_id); ?>" />
+    <?php endif; ?>
+    <?php
 }
 
+// Save meta box data
+function notion_content_save_meta_box_data($post_id) {
+    // Verify nonce
+    if (!isset($_POST['notion_content_meta_box_nonce']) ||
+        !wp_verify_nonce($_POST['notion_content_meta_box_nonce'], 'notion_content_meta_box')) {
+        return;
+    }
+
+    // If this is an autosave, don't do anything
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    // Check user permissions
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    // Save the meta fields
+    if (isset($_POST['notion_page_id'])) {
+        update_post_meta($post_id, '_notion_page_id', sanitize_text_field($_POST['notion_page_id']));
+    }
+    
+    if (isset($_POST['notion_cron_interval'])) {
+        update_post_meta($post_id, '_notion_cron_interval', sanitize_text_field($_POST['notion_cron_interval']));
+    }
+    
+    $is_active = isset($_POST['notion_is_active']) ? '1' : '0';
+    update_post_meta($post_id, '_notion_is_active', $is_active);
+    
+    if (isset($_POST['notion_webhook_id'])) {
+        update_post_meta($post_id, '_notion_webhook_id', sanitize_text_field($_POST['notion_webhook_id']));
+    }
+}
+add_action('save_post_notion_content', 'notion_content_save_meta_box_data');
+
+// Add the new custom post type registration for notion_images
+function notion_images_register_post_type() {
+    register_post_type('notion_images', array(
+        'public' => false,
+        'publicly_queryable' => false,
+        'show_ui' => false,
+        'supports' => array('title', 'editor'),
+        'can_export' => true,
+        'delete_with_user' => false
+    ));
+}
+add_action('init', 'notion_images_register_post_type');
 
 // Add menu to the Wordpress admin
 add_action('admin_menu', 'notion_content_admin_menu');

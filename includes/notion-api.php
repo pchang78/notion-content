@@ -268,20 +268,24 @@ function notion_render_block($block, $api_key, $extra = "") {
         // Image block
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
-            $image_size = get_option('notion_content_image_size');
-            if(!isset($image_size) || !$image_size || $image_size == "full") {
-                $image_url = wp_get_attachment_url($attachment_id);
-            }
-            else {
-                $image_src = wp_get_attachment_image_src($attachment_id, $image_size);
-                $image_url = $image_src[0];
-            }
-            $img_style = get_option('notion_content_style_img', '');
-            if(isset($img_style) && $img_style) {
-                $html = "<img class='$img_style' src='$image_url'>";
-            }
-            else {
-                $html = "<img src='$image_url'>";
+            if (is_wp_error($attachment_id)) {
+                error_log('Error handling image: ' . $attachment_id->get_error_message());
+                // Return a placeholder or fallback image
+                $html = "<p>[Image could not be loaded]</p>";
+            } else {
+                $image_size = get_option('notion_content_image_size');
+                if(!isset($image_size) || !$image_size || $image_size == "full") {
+                    $image_url = wp_get_attachment_url($attachment_id);
+                } else {
+                    $image_src = wp_get_attachment_image_src($attachment_id, $image_size);
+                    $image_url = $image_src[0];
+                }
+                $img_style = get_option('notion_content_style_img', '');
+                if(isset($img_style) && $img_style) {
+                    $html = "<img class='$img_style' src='$image_url'>";
+                } else {
+                    $html = "<img src='$image_url'>";
+                }
             }
             break;
 
@@ -416,11 +420,23 @@ function notion_get_text($rich_text_array, $add_breaks = false) {
 
 // Refresh all pages from Notion
 function notion_content_refresh() {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_content';
+    // Set all Notion posts to draft initially
+    $notion_posts = get_posts(array(
+        'post_type' => 'notion_content',
+        'meta_key' => 'notion_page_id',
+        'posts_per_page' => -1
+    ));
+    
+    foreach ($notion_posts as $post) {
+        $update_result = wp_update_post(array(
+            'ID' => $post->ID,
+            'post_status' => 'draft'
+        ), true); // Add true parameter to return WP_Error on failure
 
-    // Set all pages to inactive
-    $wpdb->update($table_name, ['is_active' => 0], ['is_active' => 1]);
+        if (is_wp_error($update_result)) {
+            continue; // Skip if update fails
+        }
+    }
 
     $api_key = get_option('notion_content_api_key');
     $database_url = get_option('notion_content_database_url');
@@ -441,31 +457,64 @@ function notion_content_refresh() {
         $title = $page['title'];
         $content = notion_get_page_content($api_key, $page_id);
 
-        // Check if page exists in database
-        $existing_page = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE page_id = %s", $page_id), ARRAY_A);
-        if ($existing_page) {
-            if(!$existing_page['webhook_id']) {
-                $webhook_id = bin2hex(random_bytes(16)); // Generates a 32-character unique alphanumeric string
-                $wpdb->update( $table_name, ['title' => $title, 'content' => $content, 'is_active' => 1, 'webhook_id' => $webhook_id ], ['page_id' => $page_id]);
+        if (is_wp_error($content)) {
+            // Skip this page if there's an error fetching content
+            continue;
+        }
+
+        // Find any post with this notion_page_id
+        $existing_posts = get_posts(array(
+            'post_type' => 'notion_content',
+            'meta_query' => array(
+                array(
+                    'key' => 'notion_page_id',
+                    'value' => $page_id
+                )
+            ),
+            'posts_per_page' => 1,
+            'post_status' => 'any'
+        ));
+
+        if (!empty($existing_posts)) {
+            $post = $existing_posts[0];
+            // Update existing post
+            $update_result = wp_update_post(array(
+                'ID' => $post->ID,
+                'post_title' => $title,
+                'post_content' => $content,
+                'post_status' => 'publish',
+                'post_type' => 'notion_content'
+            ), true); // Add true parameter to return WP_Error on failure
+
+            if (is_wp_error($update_result)) {
+                continue; // Skip to next page if update fails
             }
-            else {
-                // Update existing page
-                $wpdb->update( $table_name, ['title' => $title, 'content' => $content, 'is_active' => 1], ['page_id' => $page_id]);
-            }
+            
+            // Update meta values
+            update_post_meta($post->ID, 'notion_page_id', $page_id);
         } else {
-            $webhook_id = bin2hex(random_bytes(16)); // Generates a 32-character unique alphanumeric string
-            // Insert new page
-            $wpdb->insert($table_name, [ 'page_id' => $page_id, 'title' => $title, 'content' => $content, 'is_active' => 1, 'webhook_id' => $webhook_id ]);
+            // Insert new post only if no existing post was found
+            $post_id = wp_insert_post(array(
+                'post_title' => $title,
+                'post_content' => $content,
+                'post_status' => 'publish',
+                'post_type' => 'notion_content'
+            ), true); // Add true parameter to return WP_Error on failure
+
+            if (is_wp_error($post_id)) {
+                continue; // Skip to next page if insert fails
+            }
+
+            // Add Notion metadata
+            add_post_meta($post_id, 'notion_page_id', $page_id);
         }
     }
+
+    return true;
 }
 
 // Refresh a single page from Notion
 function notion_content_refresh_single_page($page_id) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_content';
-
-    // Retrieve API key
     $api_key = get_option('notion_content_api_key');
     if (!$api_key) {
         return new WP_Error('notion_content_error', 'API Key is missing.');
@@ -476,42 +525,62 @@ function notion_content_refresh_single_page($page_id) {
     if (is_wp_error($content)) {
         return $content;
     }
+    
     $page_title = notion_get_page_title($api_key, $page_id);
+    if (is_wp_error($page_title)) {
+        $page_title = 'Untitled Page'; // Provide a default title if there's an error
+    }
 
-    // Check if the page already exists in the database
-    $existing_entry = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM $table_name WHERE page_id = %s",
-        $page_id
+    // Find any post with this notion_page_id
+    $existing_posts = get_posts(array(
+        'post_type' => 'notion_content',
+        'meta_query' => array(
+            array(
+                'key' => 'notion_page_id',
+                'value' => $page_id
+            )
+        ),
+        'posts_per_page' => 1,
+        'post_status' => 'any'
     ));
 
-    if ($existing_entry > 0) {
-        // Update existing row
-        $wpdb->update(
-            $table_name,
-            [
-                'title' => $page_title,
-                'content' => $content,
-                'is_active' => 1,
-                'last_updated' => current_time('mysql')  // Update last_updated to current time
-            ],
-            ['page_id' => $page_id],
-            ['%s', '%s', '%d', '%s'],
-            ['%s']
-        );
+    if (!empty($existing_posts)) {
+        $post = $existing_posts[0];
+        // Update existing post
+        $update_result = wp_update_post(array(
+            'ID' => $post->ID,
+            'post_title' => $page_title,
+            'post_content' => $content,
+            'post_status' => 'publish',
+            'post_type' => 'notion_content',
+            'post_modified' => current_time('mysql'),
+            'post_modified_gmt' => current_time('mysql', true)
+        ), true); // Add true parameter to return WP_Error on failure
+
+        if (is_wp_error($update_result)) {
+            return $update_result;
+        }
+        
+        // Update meta values
+        update_post_meta($post->ID, 'notion_page_id', $page_id);
     } else {
-        // Insert new row if page does not exist
-        $wpdb->insert(
-            $table_name,
-            [
-                'page_id' => $page_id,
-                'title' => $page_title,
-                'content' => $content,
-                'is_active' => 1,
-                'last_updated' => current_time('mysql')
-            ],
-            ['%s', '%s', '%s', '%d', '%s']
-        );
+        // Insert new post only if no existing post was found
+        $post_id = wp_insert_post(array(
+            'post_title' => $page_title,
+            'post_content' => $content,
+            'post_status' => 'publish',
+            'post_type' => 'notion_content'
+        ), true); // Add true parameter to return WP_Error on failure
+
+        if (is_wp_error($post_id)) {
+            return $post_id;
+        }
+
+        // Add Notion metadata
+        add_post_meta($post_id, 'notion_page_id', $page_id);
     }
+
+    return true;
 }
 
 
@@ -525,18 +594,18 @@ function notion_get_page_title($api_key, $page_id) {
             'Notion-Version' => '2022-06-28'
         ]
     ]);
+    
     if (is_wp_error($response)) {
-        return $response;
+        return 'Error Fetching Title'; // Return a string instead of WP_Error
     }
 
     $body = json_decode(wp_remote_retrieve_body($response), true);
 
-    // Check if the page has a title property
-    if (isset($body['properties'])) {
-        foreach ($body['properties'] as $property) {
-            if ($property['type'] === 'title' && isset($property['title'][0]['plain_text'])) {
-                return esc_html($property['title'][0]['plain_text']);
-            }
+    // Check if the page has properties and title
+    if (isset($body['properties']) && isset($body['properties']['Name'])) {
+        $title_property = $body['properties']['Name'];
+        if (isset($title_property['title'][0]['plain_text'])) {
+            return esc_html($title_property['title'][0]['plain_text']);
         }
     }
 
@@ -545,29 +614,30 @@ function notion_get_page_title($api_key, $page_id) {
 
 // Handle image
 function notion_handle_image($object_id, $image_url) {
-    global $wpdb;
     global $wp_filesystem;
 
     // Initialize WP_Filesystem
-    if ( ! function_exists( 'WP_Filesystem' ) ) {
+    if (!function_exists('WP_Filesystem')) {
         require_once ABSPATH . 'wp-admin/includes/file.php';
     }
     WP_Filesystem();
 
-
-
-
-    $images_table = $wpdb->prefix . 'notion_images';
-
-    // Check if there's an entry in the `notion_images` table for this `object_id`
-    $image_entry = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM $images_table WHERE object_id = %s",
-        $object_id
+    // Check if there's an existing notion_images post for this object_id
+    $existing_images = get_posts(array(
+        'post_type' => 'notion_images',
+        'meta_query' => array(
+            array(
+                'key' => 'notion_object_id',
+                'value' => $object_id
+            )
+        ),
+        'posts_per_page' => 1
     ));
 
     // Check if the file exists in the WordPress Media Library
-    if ($image_entry) {
-        $post_id = $image_entry->post_id;
+    if (!empty($existing_images)) {
+        $image_post = $existing_images[0];
+        $post_id = get_post_meta($image_post->ID, 'attachment_id', true);
 
         // Check if attachment exists in the posts table
         $attachment = get_post($post_id);
@@ -580,8 +650,8 @@ function notion_handle_image($object_id, $image_url) {
             return $post_id;
         }
 
-        // If the attachment or file doesn't exist, delete the entry
-        $wpdb->delete($images_table, array('object_id' => $object_id), array('%s'));
+        // If the attachment or file doesn't exist, delete the notion_images post
+        wp_delete_post($image_post->ID, true);
     }
 
     // Use `download_url` to download the image
@@ -593,10 +663,23 @@ function notion_handle_image($object_id, $image_url) {
 
     // Move the downloaded file to the WordPress upload directory
     $uploads_dir = wp_upload_dir();
-
     $parsed_url = wp_parse_url($image_url);
     $filename = basename($parsed_url['path']); // Extract just the filename from the URL path
+
+    // Get file info
+    $path_parts = pathinfo($filename);
+    $name = $path_parts['filename'];
+    $ext = $path_parts['extension'];
+
+    // Create unique filename
+    $counter = 1;
     $destination = $uploads_dir['path'] . '/' . $filename;
+    
+    while (file_exists($destination)) {
+        $filename = $name . '-' . $counter . '.' . $ext;
+        $destination = $uploads_dir['path'] . '/' . $filename;
+        $counter++;
+    }
 
     if (!$wp_filesystem->move($temp_file, $destination)) {
         wp_delete_file($temp_file); // Clean up temp file if move fails
@@ -618,16 +701,17 @@ function notion_handle_image($object_id, $image_url) {
     $attachment_data = wp_generate_attachment_metadata($attachment_id, $destination);
     wp_update_attachment_metadata($attachment_id, $attachment_data);
 
-    // Insert a new entry
-    $wpdb->insert(
-        $images_table,
-        array(
-            'object_id' => $object_id,
-            'post_id' => $attachment_id,
-        ),
-        array('%s', '%s', '%d')
-    );
+    // Create a new notion_images post
+    $notion_image_post = wp_insert_post(array(
+        'post_type' => 'notion_images',
+        'post_status' => 'publish',
+        'post_title' => $object_id // Using object_id as the title for reference
+    ));
 
-    // Return the new post_id
+    // Add meta values
+    update_post_meta($notion_image_post, 'notion_object_id', $object_id);
+    update_post_meta($notion_image_post, 'attachment_id', $attachment_id);
+
+    // Return the attachment_id
     return $attachment_id;
 }

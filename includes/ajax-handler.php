@@ -52,28 +52,16 @@ function notion_set_cron_interval() {
         $interval = sanitize_text_field(wp_unslash($_POST['interval']));
     }
 
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_content';
-
-    // Update the database with the new interval
-    $updated = $wpdb->update(
-        $table_name,
-        array('cron_interval' => $interval),
-        array('page_id' => $page_id),
-        array('%s'),
-        array('%s')
-    );
+    // Update the post meta with the new interval
+    $updated = update_post_meta($page_id, 'notion_cron_interval', $interval);
 
     if ($updated === false) {
-        wp_send_json_error(array('message' => 'Failed to update database.'));
+        wp_send_json_error(array('message' => 'Failed to update cron interval.'));
     }
 
     // Schedule or clear the cron job for this page
-    $hook = 'notion_hook_' . $interval;
-
     wp_clear_scheduled_hook('notion_cron_update', array($page_id));
     if ($interval !== 'manual') {
-        //wp_schedule_event(time(), $interval, $hook, array($page_id));
         wp_schedule_event(time(), $interval, 'notion_cron_update', array($page_id));
     }
 

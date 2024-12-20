@@ -5,23 +5,38 @@ add_shortcode('notion_page', 'notion_page_shortcode');
 
 function notion_page_shortcode($atts) {
     $atts = shortcode_atts(['page_id' => ''], $atts, 'notion_page');
-    $page_id = sanitize_text_field($atts['page_id']);
+    $notion_page_id = sanitize_text_field($atts['page_id']);
 
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'notion_content';
+    // Query for posts with matching notion_page_id
+    $args = array(
+        'post_type' => 'notion_content',
+        'meta_query' => array(
+            array(
+                'key' => 'notion_page_id',
+                'value' => $notion_page_id,
+                'compare' => '='
+            )
+        ),
+        'posts_per_page' => 1,
+        'post_status' => 'publish'
+    );
 
-    $page = $wpdb->get_row($wpdb->prepare("SELECT content FROM $table_name WHERE page_id = %s AND is_active = %d", $page_id, 1), ARRAY_A);
+    $query = new WP_Query($args);
 
-    if ($page) {
+    if ($query->have_posts()) {
+        $query->the_post();
+        $content = get_the_content();
+        wp_reset_postdata();
+
         $custom_css = get_option('notion_content_custom_css', '');
         $extra_css = "";
         if($custom_css) {
             $extra_css .= "\n<style>\n";
             $extra_css .= $custom_css;
-            $extra_css .= "\n<style>\n";
+            $extra_css .= "\n</style>\n"; // Fixed closing tag
         }
 
-        return '<div class="notion-page-content">' . $page['content'] . $extra_css . '</div>';
+        return '<div class="notion-page-content">' . $content . $extra_css . '</div>';
     } else {
         return '<p>Content not found or inactive.</p>';
     }

@@ -2,7 +2,6 @@
 
 // Display pages
 function notion_content_display_pages() {
-
     // API and URL not setup yet
     if(!notion_content_is_setup()) {
         notion_content_setup_page();
@@ -11,16 +10,26 @@ function notion_content_display_pages() {
 
     // Refresh all content action
     if (isset($_POST['refresh_content']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
-        notion_content_refresh(); // Refresh all pages
-        notion_content_admin_msg("All Content Updated");
+        $refresh_result = notion_content_refresh(); // Refresh all pages
+        
+        if (is_wp_error($refresh_result)) {
+            notion_content_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
+        } else {
+            notion_content_admin_msg("All Content Updated");
+        }
     }
 
     // Refresh individual page action
     if (isset($_POST['refresh_single_page']) && isset($_POST['page_id']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
         if(isset($_POST['page_id'])) {
-            $page_id = sanitize_text_field(wp_unslash($_POST['page_id'])); // Ensure page_id is a string
-            notion_content_refresh_single_page($page_id); // Refresh specific page
-            notion_content_admin_msg("Content " . $page_id . " updated");
+            $page_id = sanitize_text_field(wp_unslash($_POST['page_id']));
+            $refresh_result = notion_content_refresh_single_page($page_id);
+            
+            if (is_wp_error($refresh_result)) {
+                notion_content_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
+            } else {
+                notion_content_admin_msg("Content " . $page_id . " updated");
+            }
         }
     }
 
@@ -36,9 +45,16 @@ function notion_content_display_pages() {
         <br>
         
         <?php
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'notion_content';
-        $pages = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table_name WHERE is_active = %d", 1), ARRAY_A);
+        // Query for notion_content post type
+        $args = array(
+            'post_type' => 'notion_content',
+            'posts_per_page' => -1,
+            'post_status' => 'publish',
+            'orderby' => 'title',
+            'order' => 'ASC'
+        );
+        
+        $pages = get_posts($args);
 
         if ($pages) {
             echo '<table class="wp-list-table widefat widetable striped">';
@@ -57,13 +73,14 @@ function notion_content_display_pages() {
             </thead>';
             echo '<tbody>';
             foreach ($pages as $page) {
-                $title = esc_html($page['title']);
-                $page_id = esc_attr($page['page_id']);
-                $last_updated = esc_html($page['last_updated']);
+                $title = esc_html($page->post_title);
+                $page_id = get_post_meta($page->ID, 'notion_page_id', true);
+                $last_updated = get_post_modified_time('Y-m-d H:i:s', false, $page->ID);
+                $cron_interval = get_post_meta($page->ID, 'cron_interval', true);
                 $shortcode = '[notion_page page_id="' . $page_id . '"]';
                 
                 echo '<tr>';
-                echo '<td>' . esc_html($title) . '</td>';
+                echo '<td>' . $title . '</td>';
                 echo '<td>';
                 echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 350px;"/> ';
                 echo '<button class="button copy-button" data-shortcode="' . esc_attr($shortcode) . '">Copy</button>';
@@ -78,21 +95,19 @@ function notion_content_display_pages() {
                 echo '<a href="' . esc_url($preview_url) . '" class="button" target="_blank" style="margin-left: 4px;">Preview</a>';
                 echo '</form>';
                 echo '</td>';
-
                 ?>
 
                 <td>
-                <select class="cron-interval" data-page-id="<?php echo esc_attr($page['page_id']); ?>">
-                    <option value="manual" <?php selected($page['cron_interval'], 'manual'); ?>>Manual</option>
-                    <option value="15_minutes" <?php selected($page['cron_interval'], '15_minutes'); ?>>Every 15 Minutes</option>
-                    <option value="30_minutes" <?php selected($page['cron_interval'], '30_minutes'); ?>>Every 30 Minutes</option>
-                    <option value="1_hour" <?php selected($page['cron_interval'], '1_hour'); ?>>Every Hour</option>
-                    <option value="6_hours" <?php selected($page['cron_interval'], '6_hours'); ?>>Every 6 Hours</option>
-                    <option value="12_hours" <?php selected($page['cron_interval'], '12_hours'); ?>>Every 12 Hours</option>
-                    <option value="once_a_day" <?php selected($page['cron_interval'], 'once_a_day'); ?>>Once a Day</option>
+                <select class="cron-interval" data-page-id="<?php echo esc_attr($page_id); ?>">
+                    <option value="manual" <?php selected($cron_interval, 'manual'); ?>>Manual</option>
+                    <option value="15_minutes" <?php selected($cron_interval, '15_minutes'); ?>>Every 15 Minutes</option>
+                    <option value="30_minutes" <?php selected($cron_interval, '30_minutes'); ?>>Every 30 Minutes</option>
+                    <option value="1_hour" <?php selected($cron_interval, '1_hour'); ?>>Every Hour</option>
+                    <option value="6_hours" <?php selected($cron_interval, '6_hours'); ?>>Every 6 Hours</option>
+                    <option value="12_hours" <?php selected($cron_interval, '12_hours'); ?>>Every 12 Hours</option>
+                    <option value="once_a_day" <?php selected($cron_interval, 'once_a_day'); ?>>Once a Day</option>
                 </select>
                 </td>
-
 
             <?php
                 echo '</tr>';
@@ -104,9 +119,9 @@ function notion_content_display_pages() {
         }
         ?>
 
-	    <div id="loading-overlay">
-		<div class="loading-message">Updating, please wait...</div>
-	    </div>
+        <div id="loading-overlay">
+            <div class="loading-message">Updating, please wait...</div>
+        </div>
 
     </div>
 
@@ -122,13 +137,11 @@ function notion_content_display_pages() {
                     tempInput.select();
                     document.execCommand('copy');
                     document.body.removeChild(tempInput);
-                    alert('Shortcode copied to clipboard!'); // Optional alert
+                    alert('Shortcode copied to clipboard!');
                 });
             });
         });
     </script>
-
-
 
     <?php
 }
