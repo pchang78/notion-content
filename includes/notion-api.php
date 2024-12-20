@@ -269,7 +269,6 @@ function notion_render_block($block, $api_key, $extra = "") {
         case 'image':
             $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
             if (is_wp_error($attachment_id)) {
-                error_log('Error handling image: ' . $attachment_id->get_error_message());
                 // Return a placeholder or fallback image
                 $html = "<p>[Image could not be loaded]</p>";
             } else {

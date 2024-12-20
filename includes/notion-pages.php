@@ -80,7 +80,7 @@ function notion_content_display_pages() {
                 $shortcode = '[notion_page page_id="' . $page_id . '"]';
                 
                 echo '<tr>';
-                echo '<td>' . $title . '</td>';
+                echo '<td>' . esc_html($title) . '</td>';
                 echo '<td>';
                 echo '<input type="text" value="' . esc_attr($shortcode) . '" readonly style="width: 350px;"/> ';
                 echo '<button class="button copy-button" data-shortcode="' . esc_attr($shortcode) . '">Copy</button>';
