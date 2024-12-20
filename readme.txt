@@ -44,7 +44,7 @@ Refer to the Notion API documentation to create an integration and find the nece
 Yes! Use the **Classes** section in **Notion Content > Styles** to customize CSS for each element. You can also add custom CSS in the **Custom CSS** tab.
 
 = Does the plugin cache Notion content? =
-Yes, it stores content locally in a custom database table to minimize Notion API calls. Content can be refreshed manually for specific pages or all pages at once.
+Yes, it stores content locally as a custom post type.  This reduces the number of API calls and improves performance and reduces the number of API calls to Notion.  Content can be refreshed manually for specific pages or all pages at once.
 
 == Screenshots ==
 
