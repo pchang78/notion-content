@@ -118,6 +118,9 @@ function notion_render_block($block, $api_key, $extra = "") {
         // Paragraph block
         case 'paragraph':
             $text = notion_get_text($block['paragraph']['rich_text']);
+            if(!$text) {
+                $text = "&nbsp;";
+            }
             $paragraph_style = get_option('notion_content_style_paragraph', '');
             if(isset($paragraph_style) && $paragraph_style) {
                 $html = "<p class='$paragraph_style'>$text</p>";
