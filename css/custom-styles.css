@@ -1,11 +1,11 @@
 /* css/custom-styles.css */
 
-#notion-content-plugin-admin {
+#content-importer-for-notion-plugin-admin {
     padding: 5px 20px;
 }
 
 
-#notion-content-plugin-admin .widefat {
+#content-importer-for-notion-plugin-admin .widefat {
     width: 100%; /* Makes the text fields use full width */
     max-width: 900px; /* Set a maximum width if desired */
     min-height: 40px; /* Adjust height if necessary */
@@ -13,15 +13,15 @@
 }
 
 
-#notion-content-plugin-admin .widetable {
+#content-importer-for-notion-plugin-admin .widetable {
     max-width: 100%;
 }
 
-#notion-content-plugin-admin .red-text {
+#content-importer-for-notion-plugin-admin .red-text {
     color: red;
 }
 
-#notion-content-plugin-admin #loading-overlay {
+#content-importer-for-notion-plugin-admin #loading-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -32,7 +32,7 @@
     display: none;
 }
 
-#notion-content-plugin-admin .loading-message {
+#content-importer-for-notion-plugin-admin .loading-message {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -43,7 +43,7 @@
 }
 
 
-.notion-content-header {
+.content-importer-for-notion-header {
     background-color: #2e65a8; /* Dark blue background */
     color: white;
     width: 100%;
@@ -54,7 +54,7 @@
     padding: 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.notion-content-header-inner {
+.content-importer-for-notion-header-inner {
     max-width: 100%; /* Ensure it spans the full content width */
     padding: 5px 20px;
     display: flex;
@@ -62,7 +62,7 @@
     align-items: center;
 }
 
-.notion-content-logo {
+.content-importer-for-notion-logo {
     height: 50px; /* Adjust to fit desired size */
     max-height: 100%; /* Prevent overflowing */
     width: auto; /* Maintain aspect ratio */
@@ -70,7 +70,7 @@
 }
 
 
-.notion-content-title {
+.content-importer-for-notion-title {
     font-size: 24px;
     margin: 0;
     font-weight: bold;
@@ -79,7 +79,7 @@
 
 }
 
-.notion-content-nav  {
+.content-importer-for-notion-nav  {
     display: flex;
     justify-content: flex-start; /* Aligns the nav items to the left */
     flex-grow: 1; /* Allows the nav to expand and take available space */
@@ -88,20 +88,20 @@
 }
 
 
-.notion-content-nav a {
+.content-importer-for-notion-nav a {
     margin-left: 15px;
     text-decoration: none;
     color: #ffffff; /* White text for links */
     font-weight: 500;
 }
-.notion-content-nav a:hover {
+.content-importer-for-notion-nav a:hover {
     text-decoration: underline;
 }
-.notion-content-nav a.active {
+.content-importer-for-notion-nav a.active {
     font-weight: bold;
     color: #ffcc00; /* Highlighted tab color */
 }
-.notion-content-body {
+.content-importer-for-notion-body {
     margin: 0;
     padding: 20px;
     background: #ffffff;
@@ -112,6 +112,6 @@
 #wpcontent {
     padding-left: 0 !important;
 }
-.notion-content-header {
+.content-importer-for-notion-header {
     margin-left: 0 !important;
 }

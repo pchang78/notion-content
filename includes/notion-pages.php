@@ -1,46 +1,46 @@
 <?php
 
 // Display pages
-function notion_content_display_pages() {
+function content_importer_for_notion_display_pages() {
     // API and URL not setup yet
-    if(!notion_content_is_setup()) {
-        notion_content_setup_page();
+    if(!content_importer_for_notion_is_setup()) {
+        content_importer_for_notion_setup_page();
         return;
     }
 
     // Refresh all content action
-    if (isset($_POST['refresh_content']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
-        $refresh_result = notion_content_refresh(); // Refresh all pages
+    if (isset($_POST['refresh_content']) && isset($_POST['content_importer_for_notion_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["content_importer_for_notion_pages_form_nonce"])), 'content_importer_for_notion_pages_form' )) {
+        $refresh_result = content_importer_for_notion_refresh(); // Refresh all pages
         
         if (is_wp_error($refresh_result)) {
-            notion_content_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
+            content_importer_for_notion_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
         } else {
-            notion_content_admin_msg("All Content Updated");
+            content_importer_for_notion_admin_msg("All Content Updated");
         }
     }
 
     // Refresh individual page action
-    if (isset($_POST['refresh_single_page']) && isset($_POST['page_id']) && isset($_POST['notion_content_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_pages_form_nonce"])), 'notion_content_pages_form' )) {
+    if (isset($_POST['refresh_single_page']) && isset($_POST['page_id']) && isset($_POST['content_importer_for_notion_pages_form_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["content_importer_for_notion_pages_form_nonce"])), 'content_importer_for_notion_pages_form' )) {
         if(isset($_POST['page_id'])) {
             $page_id = sanitize_text_field(wp_unslash($_POST['page_id']));
-            $refresh_result = notion_content_refresh_single_page($page_id);
+            $refresh_result = content_importer_for_notion_refresh_single_page($page_id);
             
             if (is_wp_error($refresh_result)) {
-                notion_content_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
+                content_importer_for_notion_admin_msg("Error updating content: " . $refresh_result->get_error_message(), 'error');
             } else {
-                notion_content_admin_msg("Content " . $page_id . " updated");
+                content_importer_for_notion_admin_msg("Content " . $page_id . " updated");
             }
         }
     }
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
     ?>
-    <div class="wrap" id="notion-content-plugin-admin">
+    <div class="wrap" id="content-importer-for-notion-plugin-admin">
         <h1>Notion Pages</h1>
         
         <form method="post">
             <input type="submit" name="refresh_content" class="button button-primary" value="Refresh All Content">
-            <?php wp_nonce_field( 'notion_content_pages_form', 'notion_content_pages_form_nonce' ); ?>
+            <?php wp_nonce_field( 'content_importer_for_notion_pages_form', 'content_importer_for_notion_pages_form_nonce' ); ?>
         </form>
         <br>
         
@@ -88,17 +88,17 @@ function notion_content_display_pages() {
                 echo '<td>' . esc_html($last_updated) . '</td>';
                 echo '<td>';
                 echo '<form method="post" style="display:inline;">';
-                echo '<input type="hidden" name="notion_content_pages_form_nonce" value="' . esc_attr(wp_create_nonce('notion_content_pages_form')) . '">';
+                echo '<input type="hidden" name="content_importer_for_notion_pages_form_nonce" value="' . esc_attr(wp_create_nonce('content_importer_for_notion_pages_form')) . '">';
                 echo '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '">';
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
-                $preview_url = add_query_arg(array('id' => urlencode($page_id), '_wpnonce' => wp_create_nonce( 'notion_content_preview_nonce' )), plugin_dir_url(__FILE__) . '../preview.php');
+                $preview_url = add_query_arg(array('id' => urlencode($page_id), '_wpnonce' => wp_create_nonce( 'content_importer_for_notion_preview_nonce' )), plugin_dir_url(__FILE__) . '../preview.php');
                 echo '<a href="' . esc_url($preview_url) . '" class="button" target="_blank" style="margin-left: 4px;">Preview</a>';
                 echo '</form>';
                 echo '</td>';
                 ?>
 
                 <td>
-                <select class="cron-interval" data-page-id="<?php echo esc_attr($page_id); ?>">
+                <select class="cron-interval" data-page-id="<?php echo esc_attr($page->ID); ?>">
                     <option value="manual" <?php selected($cron_interval, 'manual'); ?>>Manual</option>
                     <option value="15_minutes" <?php selected($cron_interval, '15_minutes'); ?>>Every 15 Minutes</option>
                     <option value="30_minutes" <?php selected($cron_interval, '30_minutes'); ?>>Every 30 Minutes</option>

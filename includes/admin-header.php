@@ -1,33 +1,33 @@
 <?php
 // This file is used to display the header of the Notion Content plugin in the Wordpress admin.
 ?>
-<div class="notion-content-header">
-    <div class="notion-content-header-inner">
-        <img src="<?php echo esc_html(plugin_dir_url(__FILE__) . '../assets/notion-content-logo.png'); ?>" alt="Notion Content Logo" class="notion-content-logo">
-        <h1 class="notion-content-title">Notion Content</h1>
-        <nav class="notion-content-nav">
+<div class="content-importer-for-notion-header">
+    <div class="content-importer-for-notion-header-inner">
+        <img src="<?php echo esc_html(plugin_dir_url(__FILE__) . '../assets/content-importer-logo.png'); ?>" alt="Content Importer for Notion Logo" class="content-importer-for-notion-logo">
+        <h1 class="content-importer-for-notion-title">Content Importer for Notion</h1>
+        <nav class="content-importer-for-notion-nav">
 <?php
 
 $screen = get_current_screen();
 switch($screen->id) {
-    case 'toplevel_page_notion-content':
-        $current_page = 'notion-content';
+    case 'toplevel_page_content-importer-for-notion':
+        $current_page = 'content-importer-for-notion';
         break;
-    case 'notion-content_page_notion-content-styles':
-        $current_page = 'notion-content-styles';
+    case 'content-importer-for-notion_page_content-importer-for-notion-styles':
+        $current_page = 'content-importer-for-notion-styles';
         break;
-    case 'notion-content_page_notion-content-settings':
-        $current_page = 'notion-content-settings';
+    case 'content-importer-for-notion_page_content-importer-for-notion-settings':
+        $current_page = 'content-importer-for-notion-settings';
         break;
 }
 
 
 ?>
-<?php if(notion_content_is_setup()) : ?>
+<?php if(content_importer_for_notion_is_setup()) : ?>
 
-        <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content')); ?>" class="<?php echo $current_page === 'notion-content' ? 'active' : ''; ?>">Pages</a>
-        <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content-styles')); ?>" class="<?php echo $current_page === 'notion-content-styles' ? 'active' : ''; ?>">Styles</a>
-        <a href="<?php echo esc_url(admin_url('admin.php?page=notion-content-settings')); ?>" class="<?php echo $current_page === 'notion-content-settings' ? 'active' : ''; ?>">Settings</a>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=content-importer-for-notion')); ?>" class="<?php echo $current_page === 'content-importer-for-notion' ? 'active' : ''; ?>">Pages</a>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=content-importer-for-notion-styles')); ?>" class="<?php echo $current_page === 'content-importer-for-notion-styles' ? 'active' : ''; ?>">Styles</a>
+        <a href="<?php echo esc_url(admin_url('admin.php?page=content-importer-for-notion-settings')); ?>" class="<?php echo $current_page === 'content-importer-for-notion-settings' ? 'active' : ''; ?>">Settings</a>
 <?php endif; ?>
 
 

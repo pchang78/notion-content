@@ -2,43 +2,43 @@
 /* This file is used to handle the styles of the Notion Content plugin. */
 
 // Display the styles page
-function notion_content_styles_page() {
+function content_importer_for_notion_styles_page() {
     if (!current_user_can('manage_options')) {
         wp_die(esc_html(__('You do not have sufficient permissions to access this page.', 'notion-content')));
     }
 
     // API and URL not setup yet
-    if(!notion_content_is_setup()) {
-        notion_content_setup_page();
+    if(!content_importer_for_notion_is_setup()) {
+        content_importer_for_notion_setup_page();
         return;
     }
 
     $arrFields = array(
-        'notion_content_style_paragraph' => 'paragraph_style',
-        'notion_content_style_heading1' => 'heading1_style',
-        'notion_content_style_heading2' => 'heading2_style',
-        'notion_content_style_heading3' => 'heading3_style',
-        'notion_content_style_table' => 'table_style',
-        'notion_content_style_row' => 'row_style',
-        'notion_content_style_col' => 'col_style',
-        'notion_content_style_ul' => 'ul_style',
-        'notion_content_style_li' => 'li_style',
-        'notion_content_style_quote' => 'quote_style',
-        'notion_content_style_hr' => 'hr_style',
-        'notion_content_style_img' => 'img_style',
-        'notion_content_style_column_div_wrapper' => 'col_div_wrapper_style',
-        'notion_content_style_column_div' => 'col_div_style',
-        'notion_content_style_column_table' => 'col_table_style',
-        'notion_content_style_column_row' => 'col_row_style',
-        'notion_content_style_column_col' => 'col_col_style',
+        'content_importer_for_notion_style_paragraph' => 'paragraph_style',
+        'content_importer_for_notion_style_heading1' => 'heading1_style',
+        'content_importer_for_notion_style_heading2' => 'heading2_style',
+        'content_importer_for_notion_style_heading3' => 'heading3_style',
+        'content_importer_for_notion_style_table' => 'table_style',
+        'content_importer_for_notion_style_row' => 'row_style',
+        'content_importer_for_notion_style_col' => 'col_style',
+        'content_importer_for_notion_style_ul' => 'ul_style',
+        'content_importer_for_notion_style_li' => 'li_style',
+        'content_importer_for_notion_style_quote' => 'quote_style',
+        'content_importer_for_notion_style_hr' => 'hr_style',
+        'content_importer_for_notion_style_img' => 'img_style',
+        'content_importer_for_notion_style_column_div_wrapper' => 'col_div_wrapper_style',
+        'content_importer_for_notion_style_column_div' => 'col_div_style',
+        'content_importer_for_notion_style_column_table' => 'col_table_style',
+        'content_importer_for_notion_style_column_row' => 'col_row_style',
+        'content_importer_for_notion_style_column_col' => 'col_col_style',
     );
 
 
     // Save form data when submitted
-    if (isset($_POST['notion_content_styles_save'])) {
+    if (isset($_POST['content_importer_for_notion_styles_save'])) {
 
         // Save Classes styles
-        if(isset($_POST['paragraph_style']) && isset($_POST['notion_content_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_styles_page_nonce"])), 'notion_content_styles_page' )) {
+        if(isset($_POST['paragraph_style']) && isset($_POST['content_importer_for_notion_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["content_importer_for_notion_styles_page_nonce"])), 'content_importer_for_notion_styles_page' )) {
 
             foreach($arrFields as $option_name => $field_name) {
                 if(isset($_POST[$field_name])) {
@@ -54,8 +54,8 @@ function notion_content_styles_page() {
         }
         
         // Save Custom CSS
-        if(isset($_POST['custom_css']) && isset($_POST['notion_content_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["notion_content_styles_page_nonce"])), 'notion_content_styles_page' )) {
-            update_option('notion_content_custom_css', wp_strip_all_tags(sanitize_text_field(wp_unslash($_POST['custom_css']))));
+        if(isset($_POST['custom_css']) && isset($_POST['content_importer_for_notion_styles_page_nonce']) && wp_verify_nonce( sanitize_text_field(wp_unslash($_POST["content_importer_for_notion_styles_page_nonce"])), 'content_importer_for_notion_styles_page' )) {
+            update_option('content_importer_for_notion_custom_css', wp_strip_all_tags(sanitize_text_field(wp_unslash($_POST['custom_css']))));
             echo '<div class="updated">
                 <p>Custom CSS updated successfully!</p>
                 <p>You must refresh your content for the custom CSS to be applied.</p>
@@ -71,24 +71,24 @@ function notion_content_styles_page() {
     }
 
     // Get the custom CSS
-    $custom_css = get_option('notion_content_custom_css', '');
+    $custom_css = get_option('content_importer_for_notion_custom_css', '');
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
 
     // Display the tab interface
     ?>
-    <div class="wrap" id="notion-content-plugin-admin">
-        <h1>Notion Content Classes / Styles</h1>
+    <div class="wrap" id="content-importer-for-notion-plugin-admin">
+        <h1>Content Importer for Notion Classes / Styles</h1>
         
         <!-- Tab Navigation -->
         <h2 class="nav-tab-wrapper">
-            <a href="?page=notion-content-styles&tab=classes" class="nav-tab <?php echo ((isset($_GET['tab']) && $_GET['tab'] === 'classes') || !isset($_GET['tab'])) ? 'nav-tab-active' : ''; ?>">Classes</a>
-            <a href="?page=notion-content-styles&tab=custom_css" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'custom_css') ? 'nav-tab-active' : ''; ?>">Custom CSS</a>
+            <a href="?page=content-importer-for-notion-styles&tab=classes" class="nav-tab <?php echo ((isset($_GET['tab']) && $_GET['tab'] === 'classes') || !isset($_GET['tab'])) ? 'nav-tab-active' : ''; ?>">Classes</a>
+            <a href="?page=content-importer-for-notion-styles&tab=custom_css" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'custom_css') ? 'nav-tab-active' : ''; ?>">Custom CSS</a>
         </h2>
 
         <!-- Tab Content -->
         <form method="post">
-        <?php wp_nonce_field( 'notion_content_styles_page', 'notion_content_styles_page_nonce' ); ?>
+        <?php wp_nonce_field( 'content_importer_for_notion_styles_page', 'content_importer_for_notion_styles_page_nonce' ); ?>
 
             <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'classes') : ?>
                 <!-- Classes Tab -->
@@ -263,7 +263,7 @@ function notion_content_styles_page() {
                 <textarea name="custom_css" style="width: 100%; height: 300px;"><?php echo esc_textarea($custom_css); ?></textarea>
                            <?php endif; ?>
 
-            <?php submit_button('Save Changes', 'primary', 'notion_content_styles_save'); ?>
+            <?php submit_button('Save Changes', 'primary', 'content_importer_for_notion_styles_save'); ?>
         </form>
     </div>
     <?php

@@ -2,31 +2,31 @@
 /* This file is used to handle the settings of the Notion Content plugin. */
 
 // Register settings and display settings page
-add_action('admin_init', 'notion_content_register_settings');
+add_action('admin_init', 'content_importer_for_notion_register_settings');
 
-function notion_content_register_settings() {
-    register_setting('notion_content_settings_group', 'notion_content_api_key');
-    register_setting('notion_content_settings_group', 'notion_content_database_url');
-    register_setting('notion_content_settings_group', 'notion_content_image_size');
-    register_setting('notion_content_settings_group', 'notion_content_column_tag');
+function content_importer_for_notion_register_settings() {
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_api_key');
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_database_url');
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_image_size');
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_column_tag');
 
 }
 
-function notion_content_display_success_message() {
+function content_importer_for_notion_display_success_message() {
 
     if (isset($_GET['settings-updated']) && $_GET['settings-updated'] == 'true') {
         add_settings_error(
-            'notion_content_settings_group', // Setting group
-            'notion_content_success', // Error key (unique)
+            'content_importer_for_notion_settings_group', // Setting group
+            'content_importer_for_notion_success', // Error key (unique)
             'Settings have been saved. <p>In order for your settings to take into effect, you must refresh your content.</p>', // Message text
             'updated' // Type (e.g., 'updated', 'error', 'warning', 'success')
         );
     }
 
     // Check if there are any saved settings errors
-    settings_errors('notion_content_settings_group');
+    settings_errors('content_importer_for_notion_settings_group');
 }
-add_action('admin_notices', 'notion_content_display_success_message');
+add_action('admin_notices', 'content_importer_for_notion_display_success_message');
 
 
 
@@ -58,15 +58,15 @@ function get_all_image_sizes() {
 // Display the settings page
 function notion_content_display_settings() {
     // API and URL not setup yet
-    if(!notion_content_is_setup()) {
-        notion_content_setup_page();
+    if(!content_importer_for_notion_is_setup()) {
+        content_importer_for_notion_setup_page();
         return;
     }
 
     include NOTION_CONTENT_PLUGIN_PATH . 'includes/admin-header.php';
 
     $tab_name = 'setup';
-    $setting_tab_url = add_query_arg( array( 'page' => 'notion-content-settings', 'tab' => $tab_name, '_wpnonce' => wp_create_nonce( 'switch_tab_' . $tab_name ) ), admin_url( 'admin.php' ) );
+    $setting_tab_url = add_query_arg( array( 'page' => 'content-importer-for-notion-settings', 'tab' => $tab_name, '_wpnonce' => wp_create_nonce( 'switch_tab_' . $tab_name ) ), admin_url( 'admin.php' ) );
 
 
     $general_active = "";
@@ -89,24 +89,24 @@ function notion_content_display_settings() {
 
 
     ?>
-    <div class="wrap" id="notion-content-plugin-admin">
-        <h1>Notion Content Settings</h1>
+    <div class="wrap" id="content-importer-for-notion-plugin-admin">
+        <h1>Content Importer for Notion Settings</h1>
 
 
          <!-- Tab Navigation -->
          <h2 class="nav-tab-wrapper">
-            <a href="?page=notion-content-settings" class="nav-tab <?php echo esc_attr($general_active); ?>">General</a>
+            <a href="?page=content-importer-for-notion-settings" class="nav-tab <?php echo esc_attr($general_active); ?>">General</a>
             <a href="<?php echo esc_url($setting_tab_url); ?>" class="nav-tab <?php echo esc_attr($setup_active); ?>">Setup</a>
         </h2>
 
         <form method="post" action="options.php">
-        <?php settings_fields('notion_content_settings_group'); ?>
-        <?php do_settings_sections('notion_content_settings_group'); ?>
+        <?php settings_fields('content_importer_for_notion_settings_group'); ?>
+        <?php do_settings_sections('content_importer_for_notion_settings_group'); ?>
 
 
         <?php if (!isset($_GET['tab']) || $_GET['tab'] === 'general') : ?>
-            <input type="hidden" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" />
-            <input type="hidden" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" />
+            <input type="hidden" name="content_importer_for_notion_api_key" value="<?php echo esc_attr(get_option('content_importer_for_notion_api_key')); ?>" />
+            <input type="hidden" name="content_importer_for_notion_database_url" value="<?php echo esc_attr(get_option('content_importer_for_notion_database_url')); ?>" />
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">Image Size
@@ -116,10 +116,10 @@ function notion_content_display_settings() {
                     </th>
                     <td>
                         
-                    <select name="notion_content_image_size">
+                    <select name="content_importer_for_notion_image_size">
                     <?php
                         $image_sizes = get_all_image_sizes();
-                        $selected_option = esc_attr(get_option('notion_content_image_size'));
+                        $selected_option = esc_attr(get_option('content_importer_for_notion_image_size'));
                         if(!isset($selected_option) || !$selected_option) {
                             $selected_option = "full";
                         }
@@ -140,9 +140,9 @@ function notion_content_display_settings() {
                     <td>
                         
                     <?php
-                        $selected_tag_option = esc_attr(get_option('notion_content_column_tag'));
+                        $selected_tag_option = esc_attr(get_option('content_importer_for_notion_column_tag'));
                     ?>
-                    <select name="notion_content_column_tag">
+                    <select name="content_importer_for_notion_column_tag">
                         <option name='div' value='div' <?php selected($selected_tag_option, 'div'); ?>>Div </option>
                         <option name='table' value='table' <?php selected($selected_tag_option, 'table'); ?>>Table </option>
                     </select>
@@ -152,8 +152,8 @@ function notion_content_display_settings() {
 
         <?php elseif ($_GET['tab'] === 'setup') : ?>
 
-            <input type="hidden" name="notion_content_image_size" value="<?php echo esc_attr(get_option('notion_content_image_size')); ?>" />
-            <input type="hidden" name="notion_content_column_tag" value="<?php echo esc_attr(get_option('notion_content_column_tag')); ?>" />
+            <input type="hidden" name="content_importer_for_notion_image_size" value="<?php echo esc_attr(get_option('content_importer_for_notion_image_size')); ?>" />
+            <input type="hidden" name="content_importer_for_notion_column_tag" value="<?php echo esc_attr(get_option('content_importer_for_notion_column_tag')); ?>" />
             <table class="form-table">
                 <tr valign="top">
                     <th scope="row">
@@ -162,7 +162,7 @@ function notion_content_display_settings() {
                              <span class="dashicons dashicons-editor-help"></span>
                         </span>
                     </th>
-                    <td><input type="text" name="notion_content_api_key" value="<?php echo esc_attr(get_option('notion_content_api_key')); ?>" class="widefat" /></td>
+                    <td><input type="text" name="content_importer_for_notion_api_key" value="<?php echo esc_attr(get_option('content_importer_for_notion_api_key')); ?>" class="widefat" /></td>
                 </tr>
                 
                 <tr valign="top">
@@ -171,7 +171,7 @@ function notion_content_display_settings() {
                         <span class="dashicons dashicons-editor-help"></span>
                     </span>
                     </th>
-                    <td><input type="text" name="notion_content_database_url" value="<?php echo esc_attr(get_option('notion_content_database_url')); ?>" class="widefat" /></td>
+                    <td><input type="text" name="content_importer_for_notion_database_url" value="<?php echo esc_attr(get_option('content_importer_for_notion_database_url')); ?>" class="widefat" /></td>
                 </tr>
             </table>
         <?php endif; ?>

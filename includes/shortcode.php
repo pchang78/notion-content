@@ -28,12 +28,12 @@ function notion_page_shortcode($atts) {
         $content = get_the_content();
         wp_reset_postdata();
 
-        $custom_css = get_option('notion_content_custom_css', '');
+        $custom_css = get_option('content_importer_for_notion_custom_css', '');
         $extra_css = "";
         if($custom_css) {
             $extra_css .= "\n<style>\n";
             $extra_css .= $custom_css;
-            $extra_css .= "\n</style>\n"; // Fixed closing tag
+            $extra_css .= "\n</style>\n";
         }
 
         return '<div class="notion-page-content">' . $content . $extra_css . '</div>';

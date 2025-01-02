@@ -7,9 +7,9 @@ jQuery(document).ready(function ($) {
         // Show the loading overlay
         $('#loading-overlay').fadeIn();
 
-        $.post(notionCronAjax.ajax_url, {
-            action: 'notion_set_cron_interval',
-            nonce: notionCronAjax.nonce,
+        $.post(contentImporterForNotionCronAjax.ajax_url, {
+            action: 'content_importer_for_notion_set_cron_interval',
+            nonce: contentImporterForNotionCronAjax.nonce,
             page_id: pageId,
             interval: interval
         }, function (response) {

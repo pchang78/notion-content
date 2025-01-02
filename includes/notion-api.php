@@ -1,7 +1,7 @@
 <?php
 
 // Extract Database ID from URL
-function notion_extract_database_id($url) {
+function content_importer_for_notion_extract_database_id($url) {
     if (preg_match('/([a-f0-9]{32})/', $url, $matches)) {
         return $matches[1];
     }
@@ -9,7 +9,7 @@ function notion_extract_database_id($url) {
 }
 
 // Fetch pages from Notion API
-function notion_get_pages($api_key, $database_id) {
+function content_importer_for_notion_get_pages($api_key, $database_id) {
     $url = "https://api.notion.com/v1/databases/$database_id/query";
     $response = wp_remote_post($url, [
         'headers' => [
@@ -39,7 +39,7 @@ function notion_get_pages($api_key, $database_id) {
 }
 
 // Fetch and render individual Notion page content as HTML
-function notion_get_page_content($api_key, $page_id, $debug = false) {
+function content_importer_for_notion_get_page_content($api_key, $page_id, $debug = false) {
     $url = "https://api.notion.com/v1/blocks/$page_id/children";
     $response = wp_remote_get($url, [
         'headers' => [
@@ -88,7 +88,7 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
                     }
                     break;
             }
-            $content .= notion_render_block($block, $api_key, $extra);
+            $content .= content_importer_for_notion_render_block($block, $api_key, $extra);
         }
 
         if($bulleted_list_item) {
@@ -105,11 +105,11 @@ function notion_get_page_content($api_key, $page_id, $debug = false) {
         return $content;
     }
 
-    return new WP_Error('notion_api_error', 'Could not retrieve page content from Notion.');
+    return new WP_Error('content_importer_for_notion_api_error', 'Could not retrieve page content from Notion.');
 }
 
 // Render individual block types as HTML
-function notion_render_block($block, $api_key, $extra = "") {
+function content_importer_for_notion_render_block($block, $api_key, $extra = "") {
     $html = '';
     $blockID = trim(str_replace("-", "", $block['id']));
     
@@ -117,11 +117,11 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Paragraph block
         case 'paragraph':
-            $text = notion_get_text($block['paragraph']['rich_text']);
+            $text = content_importer_for_notion_get_text($block['paragraph']['rich_text']);
             if(!$text) {
                 $text = "&nbsp;";
             }
-            $paragraph_style = get_option('notion_content_style_paragraph', '');
+            $paragraph_style = get_option('content_importer_for_notion_style_p', '');
             if(isset($paragraph_style) && $paragraph_style) {
                 $html = "<p class='$paragraph_style'>$text</p>";
             }
@@ -132,8 +132,8 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Heading 1 block
         case 'heading_1':
-            $text = notion_get_text($block['heading_1']['rich_text']);
-            $heading1_style = get_option('notion_content_style_heading1', '');
+            $text = content_importer_for_notion_get_text($block['heading_1']['rich_text']);
+            $heading1_style = get_option('content_importer_for_notion_style_h1', '');
             if(isset($heading1_style) && $heading1_style) {
                 $html = "<h1 class='$heading1_style'>$text</h1>";
             }
@@ -144,8 +144,8 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Heading 2 block
         case 'heading_2':
-            $text = notion_get_text($block['heading_2']['rich_text']);
-            $heading2_style = get_option('notion_content_style_heading2', '');
+            $text = content_importer_for_notion_get_text($block['heading_2']['rich_text']);
+            $heading2_style = get_option('content_importer_for_notion_style_h2', '');
             if(isset($heading2_style) && $heading2_style) {
                 $html = "<h2 class='$heading2_style'>$text</h2>";
             }
@@ -156,8 +156,8 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Heading 3 block
         case 'heading_3':
-            $text = notion_get_text($block['heading_3']['rich_text']);
-            $heading3_style = get_option('notion_content_style_heading3', '');
+            $text = content_importer_for_notion_get_text($block['heading_3']['rich_text']);
+            $heading3_style = get_option('content_importer_for_notion_style_h3', '');
             if(isset($heading3_style) && $heading3_style) {
                 $html = "<h3 class='$heading3_style'>$text</h3>";
             }
@@ -168,8 +168,8 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Bulleted list item block
         case 'bulleted_list_item':
-            $text = notion_get_text($block['bulleted_list_item']['rich_text']);
-            $li_style = get_option('notion_content_style_li', '');
+            $text = content_importer_for_notion_get_text($block['bulleted_list_item']['rich_text']);
+            $li_style = get_option('content_importer_for_notion_style_li', '');
             if(isset($li_style) && $li_style) {
                 $html = "<li class='$li_style'>$text";
             }
@@ -179,12 +179,12 @@ function notion_render_block($block, $api_key, $extra = "") {
 
             // Check for nested blocks
             if(isset($block["has_children"]) && $block["has_children"]) {
-                $html .= notion_get_page_content($api_key, $blockID);
+                $html .= content_importer_for_notion_get_page_content($api_key, $blockID);
             }
             $html .= "</li>";
 
             if($extra == "open") {
-                $ul_style = get_option('notion_content_style_ul', '');
+                $ul_style = get_option('content_importer_for_notion_style_ul', '');
                 if(isset($ul_style) && $ul_style) {
                     $html = "<ul class='$ul_style'>$html";
                 }
@@ -196,7 +196,7 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Numbered list item block
         case 'numbered_list_item':
-            $text = notion_get_text($block['numbered_list_item']['rich_text']);
+            $text = content_importer_for_notion_get_text($block['numbered_list_item']['rich_text']);
             $html = "<li>$text</li>";
             if($extra == "open") {
                 $html = "<ol>$html";
@@ -205,7 +205,7 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // To do block
         case 'to_do':
-            $text = notion_get_text($block['to_do']['rich_text']);
+            $text = content_importer_for_notion_get_text($block['to_do']['rich_text']);
             $checked = $block['to_do']['checked'] ? 'checked' : '';
             $html = "<p><input type='checkbox' $checked disabled> $text</p>";
             break;
@@ -213,15 +213,15 @@ function notion_render_block($block, $api_key, $extra = "") {
         // Toggle block
         case 'toggle':
             $toggle_content = "";
-            $toggle_content = notion_get_page_content($api_key, $blockID);
-            $text = notion_get_text($block['toggle']['rich_text']);
+            $toggle_content = content_importer_for_notion_get_page_content($api_key, $blockID);
+            $text = content_importer_for_notion_get_text($block['toggle']['rich_text']);
             $html = "<details><summary>$text</summary>$toggle_content</details>";
             break;
 
         // Quote block
         case 'quote':
-            $text = notion_get_text($block['quote']['rich_text']);
-            $quote_style = get_option('notion_content_style_quote', '');
+            $text = content_importer_for_notion_get_text($block['quote']['rich_text']);
+            $quote_style = get_option('content_importer_for_notion_style_quote', '');
             if(isset($quote_style) && $quote_style) {
                 $html = "<blockquote class='$quote_style'>$text</blockquote>";
             }
@@ -232,7 +232,7 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Divider block
         case 'divider':
-            $hr_style = get_option('notion_content_style_hr', '');
+            $hr_style = get_option('content_importer_for_notion_style_hr', '');
             if(isset($hr_style) && $hr_style) {
                 $html = "<hr class='$hr_style'>";
             }
@@ -243,46 +243,46 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Table block
         case 'table':
-            $table_style = get_option('notion_content_style_table', '');
+            $table_style = get_option('content_importer_for_notion_style_table', '');
             if(isset($table_style) && $table_style) {
                 $html = "<table class='$table_style'>\n";
             }
             else {
                 $html = "<table>\n";
             }
-            $table_content = notion_get_page_content($api_key, $blockID);
+            $table_content = content_importer_for_notion_get_page_content($api_key, $blockID);
             $html .= $table_content;
             $html .= "</table>";
             break;
 
         // Table row block
         case 'table_row':
-            $row_style = get_option('notion_content_style_row', '');
+            $row_style = get_option('content_importer_for_notion_style_row', '');
             if(isset($row_style) && $row_style) {
                 $html = "<tr class='$row_style'>";
             }
             else {
                 $html = "<tr>";
             }
-            $html .= notion_get_table_cells($block['table_row']['cells']);
+            $html .= content_importer_for_notion_get_table_cells($block['table_row']['cells']);
             $html .= "</tr>";
             break;
 
         // Image block
         case 'image':
-            $attachment_id = notion_handle_image($block['id'], $block['image']['file']['url']);
+            $attachment_id = content_importer_for_notion_handle_image($block['id'], $block['image']['file']['url']);
             if (is_wp_error($attachment_id)) {
                 // Return a placeholder or fallback image
                 $html = "<p>[Image could not be loaded]</p>";
             } else {
-                $image_size = get_option('notion_content_image_size');
+                $image_size = get_option('content_importer_for_notion_image_size');
                 if(!isset($image_size) || !$image_size || $image_size == "full") {
                     $image_url = wp_get_attachment_url($attachment_id);
                 } else {
                     $image_src = wp_get_attachment_image_src($attachment_id, $image_size);
                     $image_url = $image_src[0];
                 }
-                $img_style = get_option('notion_content_style_img', '');
+                $img_style = get_option('content_importer_for_notion_style_img', '');
                 if(isset($img_style) && $img_style) {
                     $html = "<img class='$img_style' src='$image_url'>";
                 } else {
@@ -293,10 +293,10 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Column list block
         case "column_list":
-            $column_tag = get_option('notion_content_column_tag');
+            $column_tag = get_option('content_importer_for_notion_column_tag');
             if($column_tag == 'div') {
 
-                $col_div_wrapper_style = get_option('notion_content_style_column_div_wrapper', '');
+                $col_div_wrapper_style = get_option('content_importer_for_notion_style_column_div_wrapper', '');
                 if(isset($col_div_wrapper_style) && $col_div_wrapper_style) {
                     $html = "<div class='$col_div_wrapper_style'>";
                 }
@@ -305,7 +305,7 @@ function notion_render_block($block, $api_key, $extra = "") {
                 }
             }
             else {
-                $col_table_style = get_option('notion_content_style_column_table', '');
+                $col_table_style = get_option('content_importer_for_notion_style_column_table', '');
                 if(isset($col_table_style) && $col_table_style) {
                     $html = "<table class='$col_table_style'>";
                 }
@@ -313,7 +313,7 @@ function notion_render_block($block, $api_key, $extra = "") {
                     $html = "<table>";
                 }
 
-                $col_row_style = get_option('notion_content_style_column_row', '');
+                $col_row_style = get_option('content_importer_for_notion_style_column_row', '');
                 if(isset($col_row_style) && $col_row_style) {
                     $html .= "<tr class='$col_row_style'>";
                 }
@@ -321,7 +321,7 @@ function notion_render_block($block, $api_key, $extra = "") {
                     $html .= "<tr>";
                 }
             }
-            $html .= notion_get_page_content($api_key, $blockID);
+            $html .= content_importer_for_notion_get_page_content($api_key, $blockID);
             if($column_tag == 'div') {
                 $html .= "</div>";
             }
@@ -332,9 +332,9 @@ function notion_render_block($block, $api_key, $extra = "") {
 
         // Column block
         case "column":
-            $column_tag = get_option('notion_content_column_tag');
+            $column_tag = get_option('content_importer_for_notion_column_tag');
             if($column_tag == 'div') {
-                $col_div_style = get_option('notion_content_style_column_div', '');
+                $col_div_style = get_option('content_importer_for_notion_style_column_div', '');
                 if(isset($col_div_style) && $col_div_style) {
                     $html = "<div class='$col_div_style'>";
                 }
@@ -343,7 +343,7 @@ function notion_render_block($block, $api_key, $extra = "") {
                 }
             }
             else {
-                $col_col_style = get_option('notion_content_style_column_col', '');
+                $col_col_style = get_option('content_importer_for_notion_style_column_col', '');
                 if(isset($col_col_style) && $col_col_style) {
                     $html = "<td class='$col_col_style'>";
                 }
@@ -351,7 +351,7 @@ function notion_render_block($block, $api_key, $extra = "") {
                     $html = "<td>";
                 }
             }
-            $html .= notion_get_page_content($api_key, $blockID);
+            $html .= content_importer_for_notion_get_page_content($api_key, $blockID);
             if($column_tag == 'div') {
                 $html .= "</div>";
             }
@@ -368,10 +368,10 @@ function notion_render_block($block, $api_key, $extra = "") {
 }
 
 // Get table cells for a given row
-function notion_get_table_cells($table_cells) {
+function content_importer_for_notion_get_table_cells($table_cells) {
     $text = '';
     foreach($table_cells AS $cell) {
-        $col_style = get_option('notion_content_style_col', '');
+        $col_style = get_option('content_importer_for_notion_style_col', '');
         if(isset($col_style) && $col_style) {
             $text .= '
                 <td class="'. $col_style . '">';
@@ -380,14 +380,14 @@ function notion_get_table_cells($table_cells) {
             $text .= '
                 <td>';
         }
-        $text .= notion_get_text($cell, true);
+        $text .= content_importer_for_notion_get_text($cell, true);
         $text .= '</td>';
     }
     return $text;
 }
 
 // Get text from a rich text array
-function notion_get_text($rich_text_array, $add_breaks = false) {
+function content_importer_for_notion_get_text($rich_text_array, $add_breaks = false) {
     $text = '';
     foreach ($rich_text_array as $rich_text) {
         $plain_text = esc_html($rich_text['plain_text']);
@@ -421,7 +421,7 @@ function notion_get_text($rich_text_array, $add_breaks = false) {
 }
 
 // Refresh all pages from Notion
-function notion_content_refresh() {
+function content_importer_for_notion_refresh() {
     // Set all Notion posts to draft initially
     $notion_posts = get_posts(array(
         'post_type' => 'notion_content',
@@ -440,15 +440,15 @@ function notion_content_refresh() {
         }
     }
 
-    $api_key = get_option('notion_content_api_key');
-    $database_url = get_option('notion_content_database_url');
-    $database_id = notion_extract_database_id($database_url);
+    $api_key = get_option('content_importer_for_notion_api_key');
+    $database_url = get_option('content_importer_for_notion_database_url');
+    $database_id = content_importer_for_notion_extract_database_id($database_url);
 
     if (!$api_key || !$database_id) {
-        return new WP_Error('notion_content_error', 'API Key or Database ID is missing.');
+        return new WP_Error('content_importer_for_notion_error', 'API Key or Database ID is missing.');
     }
 
-    $pages = notion_get_pages($api_key, $database_id);
+    $pages = content_importer_for_notion_get_pages($api_key, $database_id);
 
     if (is_wp_error($pages)) {
         return $pages;
@@ -457,7 +457,7 @@ function notion_content_refresh() {
     foreach ($pages as $page) {
         $page_id = $page['id'];
         $title = $page['title'];
-        $content = notion_get_page_content($api_key, $page_id);
+        $content = content_importer_for_notion_get_page_content($api_key, $page_id);
 
         if (is_wp_error($content)) {
             // Skip this page if there's an error fetching content
@@ -516,19 +516,19 @@ function notion_content_refresh() {
 }
 
 // Refresh a single page from Notion
-function notion_content_refresh_single_page($page_id) {
-    $api_key = get_option('notion_content_api_key');
+function content_importer_for_notion_refresh_single_page($page_id) {
+    $api_key = get_option('content_importer_for_notion_api_key');
     if (!$api_key) {
-        return new WP_Error('notion_content_error', 'API Key is missing.');
+        return new WP_Error('content_importer_for_notion_error', 'API Key is missing.');
     }
 
     // Fetch page content and title from Notion
-    $content = notion_get_page_content($api_key, $page_id);
+    $content = content_importer_for_notion_get_page_content($api_key, $page_id);
     if (is_wp_error($content)) {
         return $content;
     }
     
-    $page_title = notion_get_page_title($api_key, $page_id);
+    $page_title = content_importer_for_notion_get_page_title($api_key, $page_id);
     if (is_wp_error($page_title)) {
         $page_title = 'Untitled Page'; // Provide a default title if there's an error
     }
@@ -587,7 +587,7 @@ function notion_content_refresh_single_page($page_id) {
 
 
 // Function to get the title of a single Notion page
-function notion_get_page_title($api_key, $page_id) {
+function content_importer_for_notion_get_page_title($api_key, $page_id) {
     $url = "https://api.notion.com/v1/pages/$page_id";
 
     $response = wp_remote_get($url, [
@@ -615,7 +615,7 @@ function notion_get_page_title($api_key, $page_id) {
 }
 
 // Handle image
-function notion_handle_image($object_id, $image_url) {
+function content_importer_for_notion_handle_image($object_id, $image_url) {
     global $wp_filesystem;
 
     // Initialize WP_Filesystem

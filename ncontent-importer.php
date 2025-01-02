@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Notion Content
+Plugin Name: Content Importer for Notion
 Plugin URI: https://everydaytech.tv/wp/notion-content/
 Description: A plugin to pull content from a Notion database and display it on WordPress.
 Version: 1.0.0
@@ -65,67 +65,83 @@ add_action('admin_menu', 'notion_content_admin_menu');
 function notion_content_admin_menu() {
     // Add main menu page
     add_menu_page(
-        'Notion Content',
-        'Notion Content',
+        'Content Importer for Notion',
+        'Content Importer for Notion',
         'manage_options',
-        'notion-content',
-        'notion_content_display_pages',
-        plugins_url('assets/notion-content-icon.png', __FILE__),
+        'content-importer-for-notion',
+        'content_importer_for_notion_display_pages',
+        plugins_url('assets/content-importer-icon.png', __FILE__),
         20
     );
 
+
     // Add submenu page for styles
     add_submenu_page(
-        'notion-content', // Parent slug
+        'content-importer-for-notion', // Parent slug
+        'Notion Pages',                  // Page title
+        'Notion Pages',                  // Menu title
+        'manage_options',          // Capability
+        'content-importer-for-notion',   // Menu slug
+        'content_importer_for_notion_display_pages' // Function to display the styles page
+    );
+
+
+
+    // Add submenu page for styles
+    add_submenu_page(
+        'content-importer-for-notion', // Parent slug
         'Styles',                  // Page title
         'Styles',                  // Menu title
         'manage_options',          // Capability
-        'notion-content-styles',   // Menu slug
-        'notion_content_styles_page' // Function to display the styles page
+        'content-importer-for-notion-styles',   // Menu slug
+        'content_importer_for_notion_styles_page' // Function to display the styles page
     );
+
+
+
 
     // Add submenu page for settings
     add_submenu_page(
-        'notion-content',
+        'content-importer-for-notion',
         'Settings',
         'Settings',
         'manage_options',
-        'notion-content-settings',
+        'content-importer-for-notion-settings',
         'notion_content_display_settings'
     );
 }
 
 // Display success message
-function notion_content_admin_msg($message) {
+function content_importer_for_notion_admin_msg($message) {
 ?>
     <div class="notice notice-success is-dismissible"> <p><?php echo esc_html($message); ?></p> </div>
 <?php
 }
 
 // Enqueue scripts
-function notion_enqueue_scripts($hook) {
-    wp_enqueue_script('notion-cron-script', plugins_url('js/notion-cron.js', __FILE__), array('jquery'), '1.0', true);
-    wp_localize_script('notion-cron-script', 'notionCronAjax', array(
+function content_importer_for_notion_enqueue_scripts($hook) {
+    wp_enqueue_script('content-importer-for-notion-cron-script', plugins_url('js/content-importer-for-notion-cron.js', __FILE__), array('jquery'), '1.0', true);
+    wp_localize_script('content-importer-for-notion-cron-script', 'contentImporterForNotionCronAjax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce'    => wp_create_nonce('notion_cron_nonce')
+        'nonce'    => wp_create_nonce('content_importer_for_notion_cron_nonce')
     ));
 }
-add_action('admin_enqueue_scripts', 'notion_enqueue_scripts');
+add_action('admin_enqueue_scripts', 'content_importer_for_notion_enqueue_scripts');
 
 // Enqueue styles
-function notion_content_enqueue_styles() {
+function content_importer_for_notion_enqueue_styles() {
     $screen = get_current_screen();
-    if ($screen && ($screen->id === 'toplevel_page_notion-content' || strpos($screen->id, 'notion-content') !== false)) {
+    if ($screen && ($screen->id === 'toplevel_page_content-importer-for-notion' || strpos($screen->id, 'content-importer-for-notion') !== false)) {
         wp_enqueue_style('notion-content-custom-styles', plugin_dir_url(__FILE__) . 'css/custom-styles.css');
         wp_enqueue_style('notion-content-tooltip', plugin_dir_url(__FILE__) . 'css/tooltip.css', array(), '1.0.0');
     }
 }
-add_action('admin_enqueue_scripts', 'notion_content_enqueue_styles');
+add_action('admin_enqueue_scripts', 'content_importer_for_notion_enqueue_styles');
 
 // Add Settings link to the plugin action links
-function notion_content_plugin_action_links($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=notion-content-settings&tab=setup') . '">Settings</a>';
+function content_importer_for_notion_plugin_action_links($links) {
+    $settings_link = '<a href="' . admin_url('admin.php?page=content-importer-for-notion-settings&tab=setup') . '">Settings</a>';
     array_unshift($links, $settings_link);
     return $links;
 }
-add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'notion_content_plugin_action_links');
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'content_importer_for_notion_plugin_action_links');

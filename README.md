@@ -1,4 +1,4 @@
-# notion-content
+# content-importer-for-notion
 
 ## Description
 Wordpress Plugin for displaying content from Notion using the Notion API.  This plugin assumes you have some knowledge of [Notion](https://notion.so/) and know how to install Wordpress plugins.
