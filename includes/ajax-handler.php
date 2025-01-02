@@ -10,27 +10,27 @@ if (!defined('ABSPATH')) {
 function content_importer_for_notion_custom_cron_schedules($schedules) {
     $schedules['15_minutes'] = array(
         'interval' => 900, // 15 minutes in seconds
-        'display'  => __('Every 15 Minutes', 'content-importer-for-notion')
+        'display'  => __('Every 15 Minutes', 'content-importer-notion')
     );
     $schedules['30_minutes'] = array(
         'interval' => 1800, // 30 minutes
-        'display'  => __('Every 30 Minutes', 'content-importer-for-notion')
+        'display'  => __('Every 30 Minutes', 'content-importer-notion')
     );
     $schedules['1_hour'] = array(
         'interval' => 3600, // 1 hour
-        'display'  => __('Every Hour', 'content-importer-for-notion')
+        'display'  => __('Every Hour', 'content-importer-notion')
     );
     $schedules['6_hours'] = array(
         'interval' => 21600, // 6 hours
-        'display'  => __('Every 6 Hours', 'content-importer-for-notion')
+        'display'  => __('Every 6 Hours', 'content-importer-notion')
     );
     $schedules['12_hours'] = array(
         'interval' => 43200, // 12 hours
-        'display'  => __('Every 12 Hours', 'content-importer-for-notion')
+        'display'  => __('Every 12 Hours', 'content-importer-notion')
     );
     $schedules['once_a_day'] = array(
         'interval' => 86400, // 1 day
-        'display'  => __('Once a Day', 'content-importer-for-notion')
+        'display'  => __('Once a Day', 'content-importer-notion')
     );
     return $schedules;
 }

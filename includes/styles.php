@@ -4,7 +4,7 @@
 // Display the styles page
 function content_importer_for_notion_styles_page() {
     if (!current_user_can('manage_options')) {
-        wp_die(esc_html(__('You do not have sufficient permissions to access this page.', 'notion-content')));
+        wp_die(esc_html(__('You do not have sufficient permissions to access this page.', 'content-importer-notion')));
     }
 
     // API and URL not setup yet

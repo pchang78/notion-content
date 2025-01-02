@@ -5,14 +5,14 @@
 require_once dirname(__FILE__) . '/../../../wp-load.php';
 
 if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_GET['_wpnonce'])), 'content_importer_for_notion_preview_nonce')) {
-    wp_die(esc_html(__('Invalid nonce.', 'content-importer-for-notion')));
+    wp_die(esc_html(__('Invalid nonce.', 'content-importer-notion')));
 }
 
 // Check if 'id' is passed as a GET parameter
 $page_id = isset($_GET['id']) ? sanitize_text_field(wp_unslash($_GET['id'])) : null;
 
 if (!$page_id) {
-    wp_die(esc_html(__('Invalid page ID.', 'content-importer-for-notion')));
+    wp_die(esc_html(__('Invalid page ID.', 'content-importer-notion')));
 }
 
 // Query posts with matching notion_page_id
@@ -31,7 +31,7 @@ $args = array(
 $query = new WP_Query($args);
 
 if (!$query->have_posts()) {
-    wp_die(esc_html(__('Page not found or inactive.', 'content-importer-for-notion')));
+    wp_die(esc_html(__('Page not found or inactive.', 'content-importer-notion')));
 }
 
 // Output the page content with the header and footer
