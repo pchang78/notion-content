@@ -1,5 +1,6 @@
 <?php
 // This file is used to display the header of the Notion Content plugin in the Wordpress admin.
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 <div class="content-importer-for-notion-header">
     <div class="content-importer-for-notion-header-inner">

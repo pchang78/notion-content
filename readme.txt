@@ -33,6 +33,26 @@ Sync and display content from a Notion database in your WordPress site. Easily c
 2. Copy the shortcode for a page and paste it into any WordPress post or page.
 3. Customize styles and global CSS under **Content Importer for Notion > Styles**.
 
+
+== External services ==
+
+This plugin uses the Notion API to fetch content from Notion databases and display them in WordPress.  It does not use the Notion API to update content in Notion.  The data that is sent to the api are the Developer Integration Token and the Database URL.  These are user generated and stored in the WordPress database.  Content from Notion is stored locally as a custom post type.  This reduces the number of API calls and improves performance and reduces the number of API calls to Notion.  Content can be refreshed manually for specific pages or all pages at once.
+
+This plugin uses the following API calls:
+https://api.notion.com/v1/databases/{database_id}/query - Get list of pages in a database
+https://api.notion.com/v1/blocks/{database_id}/children - Get list of blocks in a page
+https://api.notion.com/v1/pages/{page_id} - Used for getting the title of a page
+
+
+For more information on the Notion API, please refer to the [Notion API documentation](https://developers.notion.com/reference/intro).
+
+
+
+== Privacy ==
+
+This plugin does not collect any data from your site or users.  It only uses the data that you provide to it.  The Developer Integration Token and the Database URL are stored in the WordPress database and are not shared with any external services.  The content is stored locally as a custom post type and is not shared with any external services.
+
+
 == Frequently Asked Questions ==
 
 = How do I find my Notion API Key and Database URL? =

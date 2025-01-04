@@ -5,10 +5,10 @@
 add_action('admin_init', 'content_importer_for_notion_register_settings');
 
 function content_importer_for_notion_register_settings() {
-    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_api_key');
-    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_database_url');
-    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_image_size');
-    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_column_tag');
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_api_key', array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'));
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_database_url', array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'));
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_image_size', array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'));
+    register_setting('content_importer_for_notion_settings_group', 'content_importer_for_notion_column_tag', array('type' => 'string', 'sanitize_callback' => 'sanitize_text_field'));
 
 }
 
@@ -31,7 +31,7 @@ add_action('admin_notices', 'content_importer_for_notion_display_success_message
 
 
 // Get all image sizes, including custom sizes
-function get_all_image_sizes() {
+function content_importer_for_notion_get_all_image_sizes() {
 
     $all_sizes = wp_get_registered_image_subsizes();
     $excluded_sizes = ['1536x1536', '2048x2048']; // Add sizes to exclude here
@@ -118,7 +118,7 @@ function notion_content_display_settings() {
                         
                     <select name="content_importer_for_notion_image_size">
                     <?php
-                        $image_sizes = get_all_image_sizes();
+                        $image_sizes = content_importer_for_notion_get_all_image_sizes();
                         $selected_option = esc_attr(get_option('content_importer_for_notion_image_size'));
                         if(!isset($selected_option) || !$selected_option) {
                             $selected_option = "full";

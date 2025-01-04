@@ -1,5 +1,6 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 // Register the Notion Page shortcode
 add_shortcode('notion_page', 'notion_page_shortcode');
 
@@ -30,6 +31,8 @@ function notion_page_shortcode($atts) {
 
         $custom_css = get_option('content_importer_for_notion_custom_css', '');
         if($custom_css) {
+            wp_register_style('notion-content-custom-styles', false);
+            wp_enqueue_style('notion-content-custom-styles');
             wp_add_inline_style('notion-content-custom-styles', $custom_css);
         }
 
