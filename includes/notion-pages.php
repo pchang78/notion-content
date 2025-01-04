@@ -91,7 +91,9 @@ function content_importer_for_notion_display_pages() {
                 echo '<input type="hidden" name="content_importer_for_notion_pages_form_nonce" value="' . esc_attr(wp_create_nonce('content_importer_for_notion_pages_form')) . '">';
                 echo '<input type="hidden" name="page_id" value="' . esc_attr($page_id) . '">';
                 echo '<input type="submit" name="refresh_single_page" class="button" value="Refresh Page">';
-                $preview_url = add_query_arg(array('id' => urlencode($page_id), '_wpnonce' => wp_create_nonce( 'content_importer_for_notion_preview_nonce' )), plugin_dir_url(__FILE__) . '../preview.php');
+                $preview_url = $permalink = get_permalink($page->ID);
+
+
                 echo '<a href="' . esc_url($preview_url) . '" class="button" target="_blank" style="margin-left: 4px;">Preview</a>';
                 echo '</form>';
                 echo '</td>';

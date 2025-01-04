@@ -40,7 +40,7 @@ function notion_content_activation() {
 function notion_content_register_post_type() {
     register_post_type('notion_content', array(
         'public' => false,
-        'publicly_queryable' => false,
+        'publicly_queryable' => true,
         'show_ui' => false,
         'supports' => array('title', 'editor'),
         'can_export' => true,
