@@ -125,24 +125,8 @@ function content_importer_for_notion_display_pages() {
 
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const copyButtons = document.querySelectorAll('.copy-button');
-            copyButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const shortcode = this.getAttribute('data-shortcode');
-                    const tempInput = document.createElement('input');
-                    document.body.appendChild(tempInput);
-                    tempInput.value = shortcode;
-                    tempInput.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(tempInput);
-                    alert('Shortcode copied to clipboard!');
-                });
-            });
-        });
-    </script>
-
     <?php
+
+    wp_enqueue_script('content-importer-for-notion-copy-button', plugins_url('../js/copy_button.js', __FILE__), array(), '1.0', true);
 }
 

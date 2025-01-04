@@ -29,14 +29,11 @@ function notion_page_shortcode($atts) {
         wp_reset_postdata();
 
         $custom_css = get_option('content_importer_for_notion_custom_css', '');
-        $extra_css = "";
         if($custom_css) {
-            $extra_css .= "\n<style>\n";
-            $extra_css .= $custom_css;
-            $extra_css .= "\n</style>\n";
+            wp_add_inline_style('notion-content-custom-styles', $custom_css);
         }
 
-        return '<div class="notion-page-content">' . $content . $extra_css . '</div>';
+        return '<div class="notion-page-content">' . $content  . '</div>';
     } else {
         return '<p>Content not found or inactive.</p>';
     }

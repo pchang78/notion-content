@@ -4,6 +4,8 @@ Plugin Name: Content Importer for Notion
 Plugin URI: https://everydaytech.tv/wp/notion-content/
 Description: A plugin to pull content from a Notion database and display it on WordPress.
 Version: 1.0.0
+Requires at least: 5.5
+Requires PHP: 7.2
 Author: Patrick Chang
 Author URI: https://everydaytech.tv/wp/
 License: GPLv2 or later
