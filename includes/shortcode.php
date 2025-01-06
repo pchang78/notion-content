@@ -36,7 +36,7 @@ function notion_page_shortcode($atts) {
             wp_add_inline_style('notion-content-custom-styles', $custom_css);
         }
 
-        return '<div class="notion-page-content">' . $content  . '</div>';
+        return '<div class="notion-page-content">' . wp_kses_post($content)  . '</div>';
     } else {
         return '<p>Content not found or inactive.</p>';
     }
