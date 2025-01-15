@@ -27,10 +27,17 @@ function content_importer_for_notion_get_pages($api_key, $database_id) {
     
     if (isset($body['results'])) {
         $pages = [];
+        $num = 0;
         foreach ($body['results'] as $result) {
-            $title = $result['properties']['Name']['title'][0]['plain_text'] ?? 'Untitled';
-            $page_id = $result['id'];
-            $pages[] = ['title' => $title, 'id' => $page_id];
+
+            //$title = $result['properties']['Name']['title'][0]['plain_text'] ?? 'Untitled';
+            foreach($result['properties'] as $property_name => $property) {
+                if($property['type'] == 'title') {
+                    $title = $property['title'][0]['plain_text'] ?? 'Untitled';
+                    $page_id = $result['id'];
+                    $pages[] = ['title' => $title, 'id' => $page_id];
+                }
+            }
         }
         return $pages;
     }
@@ -456,8 +463,10 @@ function content_importer_for_notion_refresh() {
 
     foreach ($pages as $page) {
         $page_id = $page['id'];
-        $title = $page['title'];
         $content = content_importer_for_notion_get_page_content($api_key, $page_id);
+        if(isset($page['title'])) {
+            $title = $page['title'];
+        }
 
         if (is_wp_error($content)) {
             // Skip this page if there's an error fetching content

@@ -73,6 +73,9 @@ Yes, it stores content locally as a custom post type.  This reduces the number o
 
 == Changelog ==
 
+= 1.0.1 =
+* Fixed issue with the page title not being displayed if the title property has a different name than the default "Name"
+
 = 1.0.0 =
 * Initial release of Content Importer for Notion.
 * Sync content from Notion database to WordPress.
